@@ -1,0 +1,1748 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>HW-ENG 402 // Modern Smartphone Hardware & Architecture Revision Hub</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            obsidian: '#060911',
+            panel: '#0d1322',
+            panelHover: '#131c31',
+            cyanAccent: '#00f0ff',
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: #060911;
+      color: #e2e8f0;
+      font-family: 'Inter', sans-serif;
+      background-image: 
+        radial-gradient(circle at 15% 10%, rgba(0, 240, 255, 0.06) 0%, transparent 45%),
+        radial-gradient(circle at 85% 85%, rgba(99, 102, 241, 0.06) 0%, transparent 45%),
+        linear-gradient(to right, rgba(148, 163, 184, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(148, 163, 184, 0.03) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 32px 32px, 32px 32px;
+      min-height: 100vh;
+    }
+
+    /* Custom Scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #060911;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1e293b;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #00f0ff;
+    }
+
+    /* 3D Flashcard Flip Animation Styles */
+    .perspective-1000 {
+      perspective: 1200px;
+    }
+    .transform-style-3d {
+      transform-style: preserve-3d;
+      transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .backface-hidden {
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+    .rotate-y-180 {
+      transform: rotateY(180deg);
+    }
+
+    /* SVG Circular Progress Ring Smooth Transition */
+    .progress-ring-circle {
+      transition: stroke-dashoffset 0.5s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.3s ease;
+      transform: rotate(-90deg);
+      transform-origin: 50% 50%;
+    }
+
+    /* Subtle Glow Active States */
+    .pill-active-cyan {
+      background: rgba(0, 240, 255, 0.15) !important;
+      border-color: #00f0ff !important;
+      color: #00f0ff !important;
+      box-shadow: 0 0 14px rgba(0, 240, 255, 0.22);
+    }
+
+    /* Custom Checkbox */
+    .topic-checkbox:checked + div {
+      background-color: #10b981;
+      border-color: #10b981;
+    }
+    .topic-checkbox:checked + div svg {
+      opacity: 1;
+      transform: scale(1);
+    }
+  </style>
+</head>
+<body class=" flex flex-col min-h-screen selection:bg-cyan-500 selection:text-slate-950">
+
+  <!-- ==================== TOP NAVIGATION & POMODORO FOCUS BAR ==================== -->
+  <header class="sticky top-0 z-40 bg-[#090e1a]/90 backdrop-blur-md border-b border-slate-800/80 px-4 lg:px-6 py-3">
+    <div class="max-w-[1600px] mx-auto flex flex-wrap items-center justify-between gap-3">
+
+      <!-- Left: Course Code & Editable Exam Topic Title -->
+      <div class="flex items-center gap-3 min-w-0">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500/20 to-indigo-500/20 border border-cyan-400/40 flex items-center justify-center shadow-[0_0_15px_rgba(0,240,255,0.18)] shrink-0">
+          <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <rect x="6" y="2" width="12" height="20" rx="2" />
+            <path d="M10 18h4M9 7h6M9 11h6" />
+          </svg>
+        </div>
+        <div class="min-w-0">
+          <div class="flex items-center gap-2">
+            <span class="font-mono text-[11px] uppercase tracking-widest text-cyan-400 font-semibold">HW-ENG 402 // REVISION HUB</span>
+            <span class="hidden sm:inline-flex items-center gap-1 text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              Auto-Saved
+            </span>
+          </div>
+          <!-- Editable Title -->
+          <div class="flex items-center gap-2 group">
+            <h1 id="courseTitleDisplay" onclick="promptEditTitle()" class="text-sm sm:text-lg font-bold text-white truncate cursor-pointer hover:text-cyan-300 transition" title="Click to customize your exam subject title">
+              Modern Smartphone Hardware & Architecture
+            </h1>
+            <button onclick="promptEditTitle()" class="text-slate-500 hover:text-cyan-400 transition p-0.5" title="Edit Exam Topic Name">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Center: Interactive Study Pomodoro Timer Widget -->
+      <div class="flex items-center gap-2 bg-slate-900/95 border border-slate-800 px-3 py-1.5 rounded-xl shadow-inner">
+        <!-- Mode Selector Pills -->
+        <div class="hidden sm:flex items-center bg-slate-950 rounded-lg p-0.5 border border-slate-800/80 text-[11px] font-mono">
+          <button onclick="setPomodoroMode('focus')" id="pomoMode-focus" class="px-2 py-1 rounded-md transition pill-active-cyan">25m Focus</button>
+          <button onclick="setPomodoroMode('short')" id="pomoMode-short" class="px-2 py-1 rounded-md text-slate-400 hover:text-slate-200 transition">5m Break</button>
+          <button onclick="setPomodoroMode('long')" id="pomoMode-long" class="px-2 py-1 rounded-md text-slate-400 hover:text-slate-200 transition">15m Long</button>
+        </div>
+
+        <!-- Timer Readout -->
+        <div class="flex items-center gap-2 px-2">
+          <span id="pomoStatusDot" class="w-2 h-2 rounded-full bg-cyan-400"></span>
+          <span id="pomoTimeDisplay" class="font-mono text-base sm:text-lg font-bold text-white tracking-wider">25:00</span>
+        </div>
+
+        <!-- Start/Pause & Reset -->
+        <div class="flex items-center gap-1">
+          <button onclick="togglePomodoro()" id="pomoToggleBtn" class="px-3 py-1 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-mono text-xs font-bold transition flex items-center gap-1">
+            <span id="pomoToggleText">Start</span>
+          </button>
+          <button onclick="resetPomodoro()" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition" title="Reset Pomodoro Timer">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Right: View Layout Switcher & Reset All Progress Button -->
+      <div class="flex items-center gap-2">
+        <!-- View Switcher (All-in-One Grid vs Focused Tabs on smaller screens) -->
+        <div class="hidden xl:flex items-center bg-slate-900 border border-slate-800 rounded-xl p-1 text-xs font-mono">
+          <button onclick="setWorkspaceLayout('all')" id="layoutBtn-all" class="px-2.5 py-1 rounded-lg transition pill-active-cyan">All-in-One View</button>
+          <button onclick="setWorkspaceLayout('focus')" id="layoutBtn-focus" class="px-2.5 py-1 rounded-lg text-slate-400 hover:text-white transition">Tab Focus</button>
+        </div>
+
+        <!-- Reset All Progress Button -->
+        <button onclick="openResetModal()" class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-300 font-mono text-xs font-medium transition" title="Clear all study progress and restore defaults">
+          <svg class="w-3.5 h-3.5 text-rose-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+          </svg>
+          <span class="hidden sm:inline">Reset All</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ==================== MAIN CONTENT CONTAINER ==================== -->
+  <main class="flex-1 max-w-[1600px] w-full mx-auto px-4 lg:px-6 py-5 space-y-6">
+
+    <!-- ==================== 1. HERO ROW: EXAM COUNTDOWN + MASTER PROGRESS RING ==================== -->
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+
+      <!-- Left (Cols 1-7): Live Editable Exam Countdown & Urgency Banner -->
+      <div class="lg:col-span-7 bg-[#0d1322]/90 border border-slate-800/90 rounded-2xl p-5 flex flex-col justify-between relative overflow-hidden shadow-xl">
+        <!-- Decorative Top Corner Glow -->
+        <div class="absolute -right-12 -top-12 w-44 h-44 bg-cyan-500/10 rounded-full blur-2xl pointer-events-none"></div>
+
+        <!-- Top Row: Urgency Status Pill & Preset Date Buttons -->
+        <div class="flex flex-wrap items-center justify-between gap-2 pb-4 border-b border-slate-800/80">
+          <div class="flex items-center gap-2">
+            <span id="urgencyBadge" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-400/40">
+              <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+              HIGH PRIORITY WINDOW
+            </span>
+          </div>
+
+          <!-- Quick Timeframe Presets -->
+          <div class="flex flex-wrap items-center gap-1.5">
+            <span class="text-[11px] font-mono text-slate-400 mr-1">Presets:</span>
+            <button onclick="setExamPresetHours(24)" id="presetBtn-24" class="preset-time-btn px-2 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700/80 text-[11px] font-mono text-slate-300 transition">+24h Crunch</button>
+            <button onclick="setExamPresetHours(72)" id="presetBtn-72" class="preset-time-btn px-2 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700/80 text-[11px] font-mono text-slate-300 transition">+3 Days</button>
+            <button onclick="setExamPresetHours(168)" id="presetBtn-168" class="preset-time-btn px-2 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700/80 text-[11px] font-mono text-slate-300 transition">+7 Days</button>
+            <button onclick="setExamPresetHours(336)" id="presetBtn-336" class="preset-time-btn px-2 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700/80 text-[11px] font-mono text-slate-300 transition">+14 Days</button>
+          </div>
+        </div>
+
+        <!-- Center Row: 4-Column Live Digital Countdown -->
+        <div class="grid grid-cols-4 gap-2.5 sm:gap-4 my-4">
+          <div class="bg-slate-950/90 border border-slate-800/90 rounded-xl p-3 text-center">
+            <div id="cdDays" class="font-mono text-2xl sm:text-4xl font-extrabold text-white tracking-tight">03</div>
+            <div class="text-[10px] sm:text-xs font-mono uppercase tracking-widest text-slate-400 mt-1">Days</div>
+          </div>
+          <div class="bg-slate-950/90 border border-slate-800/90 rounded-xl p-3 text-center">
+            <div id="cdHours" class="font-mono text-2xl sm:text-4xl font-extrabold text-cyan-400 tracking-tight">14</div>
+            <div class="text-[10px] sm:text-xs font-mono uppercase tracking-widest text-slate-400 mt-1">Hours</div>
+          </div>
+          <div class="bg-slate-950/90 border border-slate-800/90 rounded-xl p-3 text-center">
+            <div id="cdMinutes" class="font-mono text-2xl sm:text-4xl font-extrabold text-white tracking-tight">28</div>
+            <div class="text-[10px] sm:text-xs font-mono uppercase tracking-widest text-slate-400 mt-1">Minutes</div>
+          </div>
+          <div class="bg-slate-950/90 border border-slate-800/90 rounded-xl p-3 text-center">
+            <div id="cdSeconds" class="font-mono text-2xl sm:text-4xl font-extrabold text-amber-400 tracking-tight">45</div>
+            <div class="text-[10px] sm:text-xs font-mono uppercase tracking-widest text-slate-400 mt-1">Seconds</div>
+          </div>
+        </div>
+
+        <!-- Bottom Row: Custom Date Picker Input & Dynamic Study Pace Advice -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-slate-800/80">
+          <p id="urgencyAdviceText" class="text-xs text-slate-300 leading-relaxed">
+            Focus on completing high-weight <span class="text-rose-400 font-semibold">Hard</span> topics (3nm SoC & HDI PCB) before reviewing flashcards.
+          </p>
+          <div class="flex items-center gap-2 shrink-0">
+            <label for="examDateInput" class="text-[11px] font-mono text-slate-400">Target Date:</label>
+            <input
+              id="examDateInput"
+              type="datetime-local"
+              onchange="handleCustomExamDate(this.value)"
+              class="bg-slate-950 border border-slate-700 focus:border-cyan-400 rounded-lg px-2.5 py-1 text-xs font-mono text-slate-200 outline-none"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Right (Cols 8-12): Master Syllabus Progress Ring & Overall Exam Readiness Telemetry -->
+      <div class="lg:col-span-5 bg-[#0d1322]/90 border border-slate-800/90 rounded-2xl p-5 flex flex-col justify-between shadow-xl">
+        <div class="flex items-center justify-between border-b border-slate-800/80 pb-3">
+          <div>
+            <span class="text-[10px] font-mono uppercase tracking-widest text-cyan-400 font-semibold">Master Telemetry</span>
+            <h2 class="text-base font-bold text-white">Syllabus & Exam Readiness</h2>
+          </div>
+          <span id="readinessGradeBadge" class="px-2.5 py-1 rounded-lg font-mono text-xs font-bold bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">
+            READY INDEX: 0%
+          </span>
+        </div>
+
+        <!-- Center: SVG Circular Ring + 3 Sub-Metrics -->
+        <div class="flex flex-col sm:flex-row items-center gap-5 my-4">
+          <!-- SVG Master Ring -->
+          <div class="relative w-32 h-32 shrink-0 flex items-center justify-center">
+            <svg class="w-32 h-32" viewBox="0 0 120 120">
+              <circle cx="60" cy="60" r="50" fill="none" stroke="#1e293b" stroke-width="10" />
+              <circle
+                id="masterProgressCircle"
+                class="progress-ring-circle"
+                cx="60"
+                cy="60"
+                r="50"
+                fill="none"
+                stroke="#00f0ff"
+                stroke-width="10"
+                stroke-linecap="round"
+                stroke-dasharray="314.16"
+                stroke-dashoffset="314.16"
+              />
+            </svg>
+            <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+              <span id="ringPercentText" class="font-mono text-2xl font-extrabold text-white">0%</span>
+              <span class="text-[10px] font-mono uppercase text-slate-400">Syllabus</span>
+            </div>
+          </div>
+
+          <!-- 3 Pillar Breakdown Bars -->
+          <div class="flex-1 w-full space-y-3">
+            <!-- Pillar 1: Syllabus Checklist -->
+            <div>
+              <div class="flex justify-between text-xs font-mono mb-1">
+                <span class="text-slate-300">1. Topics Revised</span>
+                <span id="statChecklistCount" class="text-cyan-400 font-bold">0 / 9</span>
+              </div>
+              <div class="w-full h-2 rounded-full bg-slate-950 overflow-hidden border border-slate-800">
+                <div id="barChecklist" class="h-full bg-cyan-400 transition-all duration-300" style="width: 0%"></div>
+              </div>
+            </div>
+
+            <!-- Pillar 2: 3D Flashcards Mastered -->
+            <div>
+              <div class="flex justify-between text-xs font-mono mb-1">
+                <span class="text-slate-300">2. Flashcards Mastered</span>
+                <span id="statFlashcardsCount" class="text-emerald-400 font-bold">0 / 8</span>
+              </div>
+              <div class="w-full h-2 rounded-full bg-slate-950 overflow-hidden border border-slate-800">
+                <div id="barFlashcards" class="h-full bg-emerald-400 transition-all duration-300" style="width: 0%"></div>
+              </div>
+            </div>
+
+            <!-- Pillar 3: Practice Quiz Score -->
+            <div>
+              <div class="flex justify-between text-xs font-mono mb-1">
+                <span class="text-slate-300">3. Practice Quiz Score</span>
+                <span id="statQuizScore" class="text-amber-400 font-bold">0 / 5</span>
+              </div>
+              <div class="w-full h-2 rounded-full bg-slate-950 overflow-hidden border border-slate-800">
+                <div id="barQuiz" class="h-full bg-amber-400 transition-all duration-300" style="width: 0%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom: Quick Action Jump Links -->
+        <div class="pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs font-mono text-slate-400">
+          <span>Hard Topics Done: <strong id="statHardTopics" class="text-rose-400">0/2</strong></span>
+          <span id="needReviewAlert" class="text-amber-300">0 Cards Marked for Review</span>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==================== MOBILE / FOCUS TAB NAVIGATION BAR ==================== -->
+    <nav id="moduleTabsNav" class="flex xl:hidden bg-[#0d1322] border border-slate-800 rounded-xl p-1 gap-1 font-mono text-xs">
+      <button onclick="switchActiveModuleTab('checklist')" id="modTab-checklist" class="flex-1 py-2 rounded-lg text-center font-semibold transition pill-active-cyan">
+        📋 Syllabus (9)
+      </button>
+      <button onclick="switchActiveModuleTab('flashcards')" id="modTab-flashcards" class="flex-1 py-2 rounded-lg text-center text-slate-400 hover:text-white transition">
+        🗂️ 3D Cards (8)
+      </button>
+      <button onclick="switchActiveModuleTab('quiz')" id="modTab-quiz" class="flex-1 py-2 rounded-lg text-center text-slate-400 hover:text-white transition">
+        ⚡ Practice Quiz (5)
+      </button>
+    </nav>
+
+    <!-- ==================== MAIN 12-COLUMN STUDY WORKBENCH ==================== -->
+    <div id="studyWorkbenchGrid" class="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+
+      <!-- ==================== MODULE A: INTERACTIVE TOPIC CHECKLIST & FILTER (Cols 1-6) ==================== -->
+      <section id="sectionChecklist" class="xl:col-span-6 bg-[#0d1322]/90 border border-slate-800/90 rounded-2xl flex flex-col shadow-xl overflow-hidden">
+        <!-- Module Header -->
+        <div class="p-4 sm:p-5 border-b border-slate-800/80 flex flex-wrap items-center justify-between gap-2 bg-slate-900/40">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+              <span class="text-[11px] font-mono uppercase tracking-wider text-cyan-400 font-semibold">Module 01 // Syllabus Checklist</span>
+            </div>
+            <h2 class="text-base sm:text-lg font-bold text-white mt-0.5">Core Smartphone Hardware Topics</h2>
+          </div>
+
+          <div class="flex items-center gap-1.5">
+            <button onclick="markAllTopics(true)" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-[11px] font-mono text-slate-200 transition">
+              Check All
+            </button>
+            <button onclick="markAllTopics(false)" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-[11px] font-mono text-slate-400 transition">
+              Clear
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter Pills + Search Input + Master Linear Progress Bar -->
+        <div class="p-4 border-b border-slate-800/80 space-y-3 bg-slate-950/40">
+          <!-- Master Linear Progress Bar -->
+          <div class="space-y-1">
+            <div class="flex items-center justify-between text-xs font-mono">
+              <span class="text-slate-400">Syllabus Mastery Progress</span>
+              <span id="checklistProgressLabel" class="text-cyan-400 font-bold">0% Completed (0/9)</span>
+            </div>
+            <div class="w-full h-2.5 rounded-full bg-slate-900 overflow-hidden border border-slate-800 p-0.5">
+              <div id="checklistLinearBar" class="h-full rounded-full bg-gradient-to-r from-cyan-500 to-emerald-400 transition-all duration-300" style="width: 0%"></div>
+            </div>
+          </div>
+
+          <!-- Filter Pills & Search Row -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-1">
+            <!-- Filter Pills: All, Pending, Completed, Hard -->
+            <div class="flex flex-wrap items-center gap-1.5" role="group">
+              <button onclick="setTopicFilter('all')" data-filter="all" class="topic-filter-pill px-3 py-1 rounded-full text-xs font-mono border border-slate-700 bg-slate-900 text-slate-300 transition pill-active-cyan">
+                All (9)
+              </button>
+              <button onclick="setTopicFilter('pending')" data-filter="pending" class="topic-filter-pill px-3 py-1 rounded-full text-xs font-mono border border-slate-700 bg-slate-900 text-slate-300 hover:border-slate-500 transition">
+                Pending
+              </button>
+              <button onclick="setTopicFilter('completed')" data-filter="completed" class="topic-filter-pill px-3 py-1 rounded-full text-xs font-mono border border-slate-700 bg-slate-900 text-slate-300 hover:border-slate-500 transition">
+                Completed
+              </button>
+              <button onclick="setTopicFilter('Hard')" data-filter="Hard" class="topic-filter-pill px-3 py-1 rounded-full text-xs font-mono border border-rose-500/40 bg-rose-500/10 text-rose-300 hover:border-rose-400 transition">
+                🔥 Hard Only
+              </button>
+            </div>
+
+            <!-- Quick Search -->
+            <div class="relative sm:w-52">
+              <svg class="w-3.5 h-3.5 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+              <input
+                id="topicSearchInput"
+                type="text"
+                placeholder="Filter notes (e.g. OIS, BMS)..."
+                oninput="renderTopicsList()"
+                class="w-full bg-slate-900 border border-slate-800 focus:border-cyan-400 rounded-lg pl-8 pr-3 py-1 text-xs text-slate-200 placeholder-slate-500 outline-none transition"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Topics List Container -->
+        <div id="topicsListContainer" class="p-4 space-y-2.5 max-h-[680px] overflow-y-auto">
+          <!-- Populated dynamically via JS -->
+        </div>
+      </section>
+
+      <!-- ==================== RIGHT COLUMN STACK: 3D FLASHCARDS + SCORED PRACTICE QUIZ (Cols 7-12) ==================== -->
+      <div id="rightColumnStack" class="xl:col-span-6 space-y-6">
+
+        <!-- ==================== MODULE B: 3D FLIP-CARDS DECK ==================== -->
+        <section id="sectionFlashcards" class="bg-[#0d1322]/90 border border-slate-800/90 rounded-2xl p-4 sm:p-5 shadow-xl space-y-4">
+          <!-- Header & Deck Mode Controls -->
+          <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-800/80">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                <span class="text-[11px] font-mono uppercase tracking-wider text-emerald-400 font-semibold">Module 02 // Active Recall Deck</span>
+              </div>
+              <h2 class="text-base sm:text-lg font-bold text-white mt-0.5">3D Interactive Hardware Flashcards</h2>
+            </div>
+
+            <!-- Deck Filter & Shuffle -->
+            <div class="flex items-center gap-1.5">
+              <button
+                onclick="toggleFlashcardReviewFilter()"
+                id="fcFilterReviewBtn"
+                class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-mono text-slate-300 transition"
+                title="Show only cards marked 'Need Review'"
+              >
+                Need Review Only (0)
+              </button>
+              <button
+                onclick="shuffleFlashcards()"
+                class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-mono text-cyan-300 flex items-center gap-1 transition"
+                title="Shuffle Flashcard Order"
+              >
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/>
+                  <polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/>
+                  <line x1="4" y1="4" x2="9" y2="9"/>
+                </svg>
+                <span>Shuffle</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Mastery Progress Strip -->
+          <div class="flex items-center justify-between text-xs font-mono bg-slate-950/80 px-3.5 py-2 rounded-xl border border-slate-800/80">
+            <span id="fcPositionCounter" class="text-slate-300 font-semibold">CARD 01 OF 08</span>
+            <div class="flex items-center gap-3">
+              <span class="text-emerald-400">✓ Got It: <strong id="fcGotItCount">0</strong></span>
+              <span class="text-amber-400">⚑ Review: <strong id="fcReviewCount">0</strong></span>
+            </div>
+          </div>
+
+          <!-- 3D Flip Card Stage -->
+          <div class="perspective-1000 w-full h-64 sm:h-72 cursor-pointer select-none" onclick="flipCurrentFlashcard()">
+            <div id="flashcard3DInner" class="transform-style-3d relative w-full h-full">
+
+              <!-- FRONT FACE (Question) -->
+              <div class="backface-hidden absolute inset-0 rounded-2xl bg-gradient-to-br from-slate-900 via-[#0f172a] to-slate-950 border-2 border-slate-700/80 hover:border-cyan-400/60 p-5 sm:p-6 flex flex-col justify-between shadow-2xl transition-colors">
+                <div class="flex items-center justify-between">
+                  <span id="fcFrontCategory" class="px-2.5 py-0.5 rounded-full text-[11px] font-mono font-semibold bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">
+                    Layer 01 • Display
+                  </span>
+                  <span id="fcFrontStatusBadge" class="px-2 py-0.5 rounded text-[10px] font-mono uppercase bg-slate-800 text-slate-400 border border-slate-700">
+                    Unseen
+                  </span>
+                </div>
+
+                <div class="my-auto py-2">
+                  <div class="text-[10px] font-mono uppercase tracking-widest text-slate-400 mb-1.5">Question Prompt</div>
+                  <h3 id="fcFrontQuestion" class="text-base sm:text-xl font-bold text-white leading-snug">
+                    Loading question...
+                  </h3>
+                </div>
+
+                <div class="flex items-center justify-between text-[11px] font-mono text-slate-400 pt-2 border-t border-slate-800/80">
+                  <span>Click card or press <kbd class="px-1.5 py-0.5 bg-slate-800 text-slate-200 rounded border border-slate-700">Space</kbd> to flip</span>
+                  <span class="text-cyan-400 flex items-center gap-1 font-semibold">
+                    Flip to Answer →
+                  </span>
+                </div>
+              </div>
+
+              <!-- BACK FACE (Answer & Engineering Takeaway) -->
+              <div class="backface-hidden rotate-y-180 absolute inset-0 rounded-2xl bg-gradient-to-br from-[#0c192c] via-[#0f1d33] to-slate-950 border-2 border-cyan-400/70 p-5 sm:p-6 flex flex-col justify-between shadow-2xl">
+                <div class="flex items-center justify-between">
+                  <span class="px-2.5 py-0.5 rounded-full text-[11px] font-mono font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                    Technical Answer & Spec
+                  </span>
+                  <span class="text-[11px] font-mono text-cyan-300">Click to flip back ↺</span>
+                </div>
+
+                <div class="my-auto space-y-2.5 overflow-y-auto py-1">
+                  <p id="fcBackAnswer" class="text-xs sm:text-sm text-slate-100 leading-relaxed font-medium">
+                    Loading answer...
+                  </p>
+                  <div class="p-2.5 rounded-xl bg-slate-950/90 border border-cyan-500/30 text-xs font-mono text-cyan-300">
+                    <strong class="text-cyan-400">EXAM KEY:</strong> <span id="fcBackKeyPoint"></span>
+                  </div>
+                </div>
+
+                <div class="text-[11px] font-mono text-slate-400 pt-2 border-t border-slate-800/80 flex items-center justify-between">
+                  <span>Rate your recall below to track mastery</span>
+                  <span class="text-emerald-400 font-semibold">3D Active Recall</span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Flashcard Navigation & Self-Rating Controls -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
+            <button onclick="prevFlashcard()" class="py-2.5 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-mono text-slate-200 flex items-center justify-center gap-1.5 transition">
+              <span>← Prev</span>
+            </button>
+            <button onclick="markFlashcardStatus('review')" class="py-2.5 px-3 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-xs font-mono font-semibold text-amber-300 flex items-center justify-center gap-1.5 transition">
+              <span>⚑ Need Review</span>
+            </button>
+            <button onclick="markFlashcardStatus('mastered')" class="py-2.5 px-3 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/50 text-xs font-mono font-semibold text-emerald-300 flex items-center justify-center gap-1.5 transition">
+              <span>✓ Got It!</span>
+            </button>
+            <button onclick="nextFlashcard()" class="py-2.5 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-mono text-slate-200 flex items-center justify-center gap-1.5 transition">
+              <span>Next →</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- ==================== MODULE C: SCORED 5-QUESTION PRACTICE QUIZ ==================== -->
+        <section id="sectionQuiz" class="bg-[#0d1322]/90 border border-slate-800/90 rounded-2xl p-4 sm:p-5 shadow-xl space-y-4">
+          <!-- Quiz Header & Live Score Tally -->
+          <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-800/80">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                <span class="text-[11px] font-mono uppercase tracking-wider text-amber-400 font-semibold">Module 03 // Exam Simulator</span>
+              </div>
+              <h2 class="text-base sm:text-lg font-bold text-white mt-0.5">Scored Multiple-Choice Practice Quiz</h2>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <div class="px-3 py-1 rounded-xl bg-slate-950 border border-slate-800 font-mono text-xs">
+                Score: <span id="quizScoreHeader" class="text-amber-400 font-bold">0 / 5</span>
+              </div>
+              <button
+                onclick="retakePracticeQuiz()"
+                class="px-3 py-1 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-400/40 text-amber-300 font-mono text-xs font-semibold flex items-center gap-1 transition"
+              >
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                </svg>
+                <span>Retake Quiz</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Quiz Questions Container -->
+          <div id="quizQuestionsContainer" class="space-y-4 max-h-[540px] overflow-y-auto pr-1">
+            <!-- Populated dynamically via JS -->
+          </div>
+        </section>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ==================== FLOATING TOAST NOTIFICATION ==================== -->
+  <div id="toastBanner" class="fixed bottom-5 right-5 z-50 pointer-events-none opacity-0 translate-y-2 transition-all duration-300 px-4 py-2.5 rounded-xl bg-slate-900/95 border border-cyan-400/50 text-cyan-300 font-mono text-xs shadow-2xl flex items-center gap-2">
+    <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+    <span id="toastMessage">Saved progress</span>
+  </div>
+
+  <!-- ==================== EDIT COURSE TITLE MODAL ==================== -->
+  <div id="editTitleModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-[#0f172a] border border-slate-700 rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between">
+        <h3 class="text-base font-bold text-white">Customize Exam / Course Title</h3>
+        <button onclick="closeEditTitleModal()" class="text-slate-400 hover:text-white">✕</button>
+      </div>
+      <p class="text-xs text-slate-400">Personalize the header for your upcoming revision subject:</p>
+      <input
+        id="customTitleInput"
+        type="text"
+        class="w-full bg-slate-950 border border-slate-700 focus:border-cyan-400 rounded-xl px-3.5 py-2 text-sm text-white outline-none"
+        placeholder="e.g., Modern Smartphone Hardware & Architecture"
+      />
+      <div class="flex justify-end gap-2 pt-2">
+        <button onclick="closeEditTitleModal()" class="px-3.5 py-1.5 rounded-lg bg-slate-800 text-xs font-mono text-slate-300">Cancel</button>
+        <button onclick="saveCustomTitle()" class="px-4 py-1.5 rounded-lg bg-cyan-500 text-slate-950 font-mono text-xs font-bold">Save Title</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== RESET ALL PROGRESS CONFIRMATION MODAL ==================== -->
+  <div id="resetModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-[#0f172a] border border-rose-500/40 rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-rose-500/15 border border-rose-500/40 flex items-center justify-center text-rose-400 shrink-0">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+          </svg>
+        </div>
+        <div>
+          <h3 class="text-base font-bold text-white">Reset All Study Progress?</h3>
+          <p class="text-xs text-slate-400">This will uncheck all syllabus topics, reset 3D flashcard mastery, and clear your quiz score.</p>
+        </div>
+      </div>
+      <div class="flex justify-end gap-2 pt-2">
+        <button onclick="closeResetModal()" class="px-3.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-mono text-slate-300">Cancel</button>
+        <button onclick="confirmResetAllProgress()" class="px-4 py-1.5 rounded-lg bg-rose-500 hover:bg-rose-400 text-slate-950 font-mono text-xs font-bold">Yes, Reset Everything</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== APPLICATION LOGIC & STUDY DATA ==================== -->
+  <script>
+    /***************************************************************************
+     * 1. SYLLABUS TOPICS DATASET (9 COMPREHENSIVE HARDWARE TOPICS)
+     ***************************************************************************/
+    const SYLLABUS_TOPICS = [
+      {
+        id: 't1',
+        code: 'MOD-01',
+        title: 'LTPO OLED Display & DDIC Architecture',
+        difficulty: 'Medium',
+        category: 'Optics & Display',
+        examWeight: '12% Exam Weight',
+        summary: 'Variable refresh rate (1–120Hz) backplanes, sub-pixel diamond pentile layouts, and Display Driver IC (DDIC) COF bonding.',
+        notes: [
+          'LTPO (Low-Temperature Polycrystalline Oxide) combines LTPS switching TFTs with IGZO oxide TFTs to cut leakage current, allowing dynamic 1Hz–120Hz scaling without flicker.',
+          'PWM (Pulse Width Dimming) at 480Hz–2160Hz modulates peak OLED brightness; DC dimming alters current directly but can shift RGB color balance at low nits.',
+          'The DDIC (Display Driver IC) is Chip-on-Flex (COF) bonded at the bottom bezel; tearing this 0.15mm polyimide ribbon during screen removal causes permanent vertical green lines.'
+        ],
+        formula: 'Power_OLED ∝ Σ (I_pixel × V_dd) + f_refresh × C_panel × V²'
+      },
+      {
+        id: 't2',
+        code: 'MOD-02',
+        title: '3nm SoC Packaging, PoP & Heterogeneous Cores',
+        difficulty: 'Hard',
+        category: 'Silicon & Compute',
+        examWeight: '18% Exam Weight',
+        summary: 'Gate-All-Around (GAA) nanosheet transistors, Package-on-Package (PoP) LPDDR5X DRAM thermal coupling, and Prime/Performance/Efficiency core scheduling.',
+        notes: [
+          'Package-on-Package (PoP) stacks the 12GB LPDDR5X DRAM die directly atop the 3nm Application Processor (SoC) via micro-solder ball arrays to minimize trace inductance and RC delay.',
+          'Because DRAM sits between the SoC and the copper vapor chamber, heat from the CPU must conduct through the memory package or via dedicated silicon thermal pillars.',
+          'Dark Silicon constraint: Not all 18 billion transistors can run at peak clock simultaneously without breaching the 5W–7W passive smartphone TDP envelope.'
+        ],
+        formula: 'P_dynamic = α · C · V_dd² · f   |   P_leakage = V_dd · I_subthreshold'
+      },
+      {
+        id: 't3',
+        code: 'MOD-03',
+        title: 'L-Shaped HDI Mainboard & RF Faraday Shielding',
+        difficulty: 'Hard',
+        category: 'PCB & RF Engineering',
+        examWeight: '16% Exam Weight',
+        summary: '14-layer Substrate-Like PCB (SLP) stacked via micro-interposers, laser-drilled blind vias, and stamped Nickel-Silver EMI cans.',
+        notes: [
+          'Double-stacked SLP (Substrate-Like PCB) sandwiches two 14-layer boards together using a perimeter solder interposer frame, cutting mainboard footprint by 35% to leave room for the battery.',
+          '5G Sub-6GHz and mmWave transceivers require isolated 50Ω impedance-controlled microstrip traces and grounded Nickel-Silver Faraday cans to prevent crosstalk with the PMIC.',
+          'Repair Rule: Always unclip the Battery Board-to-Board (BTB) connector with a non-conductive nylon spudger before probing any PCB test pads.'
+        ],
+        formula: 'Z_0 = (87 / √(ε_r + 1.41)) · ln(5.98·h / (0.8·w + t))  [50Ω Microstrip]'
+      },
+      {
+        id: 't4',
+        code: 'MOD-04',
+        title: 'Periscope Telephoto Optics, OIS & CMOS Sensors',
+        difficulty: 'Medium',
+        category: 'Optics & Imaging',
+        examWeight: '12% Exam Weight',
+        summary: '90° right-angle prism light folding, Voice Coil Motor (VCM) Hall-effect Optical Image Stabilization, and Back-Illuminated (BSI) stacked CMOS.',
+        notes: [
+          'A 75mm–120mm focal length lens cannot fit vertically inside an 8mm thin smartphone; a periscope module uses a 90° prism to fold light horizontally across the phone width.',
+          'Sensor-Shift OIS moves the CMOS die itself using electromagnetic Voice Coil Motors (VCM) and closed-loop Hall sensors at 5,000 updates/sec.',
+          'Caution: Strong external magnets or ultrasonic baths permanently demagnetize VCM OIS actuators.'
+        ],
+        formula: 'Crop_Factor = Diagonal_35mm (43.3mm) / Diagonal_Sensor'
+      },
+      {
+        id: 't5',
+        code: 'MOD-05',
+        title: 'High-Density Li-Ion Pouch Cells & BMS Protection',
+        difficulty: 'Easy',
+        category: 'Power Systems',
+        examWeight: '10% Exam Weight',
+        summary: 'Silicon-carbon anodes, nominal 3.88V vs 4.45V charge cutoff, Texas Instruments BMS fuel gauge ICs, and safe IPA adhesive release.',
+        notes: [
+          'Energy in Watt-hours (Wh) is Nominal Voltage × Capacity in Amp-hours: 3.88V × 4.8Ah = 18.62 Wh.',
+          'The internal BMS protection PCB incorporates dual back-to-back MOSFETs and a PTC thermistor to trip immediately on over-voltage (>4.48V), under-voltage (<2.5V), or short circuit.',
+          'Safe Removal: Discharge below 25% before teardown to reduce stored chemical energy; use 99% Isopropyl Alcohol (IPA) to dissolve acrylic adhesive if pull-tabs snap.'
+        ],
+        formula: 'E (Wh) = V_nominal (3.88V) × Q (Ah)   |   C-Rate = I_charge / Q_rated'
+      },
+      {
+        id: 't6',
+        code: 'MOD-06',
+        title: 'Qi2 / MagSafe Inductive Coil & Ferrite Shielding',
+        difficulty: 'Medium',
+        category: 'Power & Electromagnetics',
+        examWeight: '10% Exam Weight',
+        summary: 'Multi-strand Litz copper windings, skin-effect mitigation at 127.7 kHz / 360 kHz, nanocrystalline ferrite backing, and glass rear housings.',
+        notes: [
+          'Why glass backs are mandatory: An aluminum back cover acts as a shorted single-turn secondary transformer winding, generating severe parasitic eddy currents that block magnetic flux and overheat the chassis.',
+          'A thin nanocrystalline ferrite sheet sits between the copper coil and the battery to steer magnetic flux lines away from the steel battery pouch and boost coupling coefficient k.',
+          'Litz wire (dozens of individually insulated micro-strands woven together) reduces AC skin-effect resistance at 110–360 kHz operating frequencies.'
+        ],
+        formula: 'ε = -N · (dΦ_B / dt)   |   δ_skin = √(ρ / (π · f · μ))'
+      },
+      {
+        id: 't7',
+        code: 'MOD-07',
+        title: 'USB-C PD Controller, Sub-Board & Coaxial Links',
+        difficulty: 'Easy',
+        category: 'I/O & Interconnects',
+        examWeight: '8% Exam Weight',
+        summary: 'Reversible 24-pin USB-C 3.2 Gen 2 pinout, CC1/CC2 Programmable Power Supply (PPS) negotiation, and micro-coaxial RF jumper cables.',
+        notes: [
+          'USB Power Delivery (USB-PD 3.1 PPS) negotiates voltage in 20mV steps (3.3V–21V) over the CC1/CC2 pins so the phone’s switched-capacitor charge pump operates at 97% efficiency.',
+          'The bottom sub-board houses the primary MEMS microphone, SIM reader, and lower cellular diversity antennas, linked to the top mainboard via low-loss shielded coaxial cables.',
+          'A fluororubber red O-ring gasket around the USB-C tongue seals the chassis to IP68 (1.5m–6m submersion for 30 mins).'
+        ],
+        formula: 'P_loss = I_bus² · R_cable   (Halving current by doubling V reduces cable heat by 4×)'
+      },
+      {
+        id: 't8',
+        code: 'MOD-08',
+        title: 'Vapor Chamber Thermal Dissipation & Graphite Sheets',
+        difficulty: 'Medium',
+        category: 'Thermal Engineering',
+        examWeight: '8% Exam Weight',
+        summary: 'Two-phase evaporation/condensation cycle inside a vacuum-sealed copper envelope, capillary wick return, and anisotropic pyrolytic graphite.',
+        notes: [
+          'A copper Vapor Chamber (VC) achieves an effective thermal conductivity of 20,000+ W/m·K by vaporizing a micro-droplet of deionized water over the 3nm SoC hotspot and condensing it across the cool mid-frame.',
+          'Sintered copper powder micro-wicks return condensed liquid back to the evaporator zone via capillary action, regardless of phone orientation (gravity-independent).',
+          'Pyrolytic Graphite Sheets (PGS) conduct heat 5× better in-plane (X-Y: 1500 W/m·K) than through-plane (Z: 15 W/m·K), spreading hotspots without scorching the user’s fingers.'
+        ],
+        formula: 'Q_cond = -k · A · (ΔT / Δx)   |   R_th = (T_junction - T_ambient) / P_SoC'
+      },
+      {
+        id: 't9',
+        code: 'MOD-09',
+        title: 'X-Axis Linear Resonant Actuator (LRA) & Acoustics',
+        difficulty: 'Easy',
+        category: 'Electromechanics',
+        examWeight: '6% Exam Weight',
+        summary: 'Spring-mounted neodymium seismic mass driven at 165Hz mechanical resonance vs legacy ERM motors, and N’Bass micro-bead speaker cavities.',
+        notes: [
+          'Unlike eccentric rotating mass (ERM) motors that take 60ms to spin up, an X-Axis LRA drives a magnetic mass on laser-cut leaf springs with <5ms rise/braking time for crisp haptic clicks.',
+          'Acoustic trick: Filling the sealed rear loudspeaker chamber with porous zeolite micro-beads isothermally absorbs air compression, making a 0.6 cc cavity sound like a 1.0 cc enclosure (+3 dB bass).'
+        ],
+        formula: 'f_resonance = (1 / 2π) · √(k_spring / m_seismic)  ≈ 160–170 Hz'
+      }
+    ];
+
+    /***************************************************************************
+     * 2. 3D FLASHCARDS DATASET (8 TECHNICAL CARDS)
+     ***************************************************************************/
+    const FLASHCARDS_DATA = [
+      {
+        id: 'fc1',
+        category: 'Layer 08 • Back Cover & RF',
+        question: 'Why do modern smartphones with Qi2 / MagSafe wireless charging require a glass or polymer back cover instead of anodized aluminum?',
+        answer: 'An alternating magnetic field passing through a conductive metal sheet induces strong circular Eddy Currents (Faraday/Lenz law). This acts as a shorted electromagnetic shield, blocking energy transfer to the internal copper coil and heating up the metal case.',
+        keyPoint: 'Glass is 100% RF & magnetically transparent (zero eddy current loss).'
+      },
+      {
+        id: 'fc2',
+        category: 'Layer 03 • Main Logic Board',
+        question: 'What is the primary engineering trade-off of stacking LPDDR5X DRAM directly on top of the 3nm SoC using Package-on-Package (PoP)?',
+        answer: 'PoP drastically shortens the memory bus trace length (cutting power and boosting bandwidth to 8533 Mbps), but it traps the hot SoC die underneath the DRAM package—creating a severe vertical thermal bottleneck.',
+        keyPoint: 'Signal integrity & board area improve, while SoC-to-Vapor-Chamber heat transfer becomes harder.'
+      },
+      {
+        id: 'fc3',
+        category: 'Layer 01 • LTPO OLED Display',
+        question: 'How does an LTPO (Low-Temperature Polycrystalline Oxide) OLED backplane save battery power compared to a standard LTPS OLED panel?',
+        answer: 'LTPO combines high-mobility LTPS drive transistors with ultra-low-leakage IGZO (Indium Gallium Zinc Oxide) switching transistors. Because oxide TFTs hold their charge much longer without refreshing, the display can drop its refresh rate down to 1Hz on static content.',
+        keyPoint: 'Dynamic 1Hz–120Hz VRR reduces display controller and backplane switching power by up to 20%.'
+      },
+      {
+        id: 'fc4',
+        category: 'Layer 05 • Li-Ion Pouch Battery',
+        question: 'A smartphone battery is rated at 4800 mAh with a nominal voltage of 3.88V. What is its stored energy in Watt-hours (Wh), and why should it be discharged below 25% before repair?',
+        answer: 'Energy = 4.8 Ah × 3.88 V = 18.62 Wh. At <25% State of Charge (SoC), the lithium intercalation potential is much lower—if the pouch is accidentally nicked during removal, it is far less likely to undergo violent exothermic thermal runaway.',
+        keyPoint: '18.62 Wh total energy; <25% charge minimizes thermal runaway fire hazard.'
+      },
+      {
+        id: 'fc5',
+        category: 'Layer 02 • Vapor Chamber Cooling',
+        question: 'How does a 0.35mm thin Copper Vapor Chamber move heat across a smartphone even when the phone is held upside down?',
+        answer: 'The inner walls of the vacuum-sealed copper chamber are lined with a sintered copper powder capillary wick. Water evaporates at the hot SoC zone, travels as vapor to cool regions, condenses, and is pulled back against gravity by capillary surface tension.',
+        keyPoint: 'Two-phase latent heat of vaporization + capillary wick = gravity-independent cooling.'
+      },
+      {
+        id: 'fc6',
+        category: 'Layer 04 • Camera Optics',
+        question: 'Why must technicians avoid placing smartphone camera modules near strong magnetic screw mats or ultrasonic cleaners?',
+        answer: 'Modern Optical Image Stabilization (OIS) and autofocus rely on delicate Voice Coil Motors (VCM), permanent micro-magnets, and flex suspension wires. Strong external fields demagnetize the VCM, and ultrasonic cavitation shatters the suspension springs.',
+        keyPoint: 'VCM + Hall-effect OIS actuators are permanently ruined by external magnets or ultrasonic waves.'
+      },
+      {
+        id: 'fc7',
+        category: 'Layer 07 • Wireless Coil & Ferrite',
+        question: 'What role does the black nanocrystalline ferrite sheet play directly behind the copper wireless charging coil?',
+        answer: 'The high-permeability ferrite sheet provides a low-reluctance path that channels magnetic flux lines into the copper windings while shielding the aluminum mid-frame and Li-Ion battery behind it from stray magnetic heating.',
+        keyPoint: 'Boosts inductive coupling efficiency (k) and blocks magnetic flux from heating the battery.'
+      },
+      {
+        id: 'fc8',
+        category: 'Layer 06 • Acoustics & Haptics',
+        question: 'How do acoustic engineers make a tiny 0.6 cc bottom loudspeaker enclosure perform like a physically larger 1.0 cc speaker box?',
+        answer: 'They pack the sealed rear air cavity with microscopic porous zeolite beads (e.g., N’Bass material). The pores adsorb and desorb air molecules isothermally during sound wave compression, lowering air stiffness and deepening bass resonance.',
+        keyPoint: 'Zeolite micro-beads reduce acoustic air stiffness → ~40% larger virtual speaker volume.'
+      }
+    ];
+
+    /***************************************************************************
+     * 3. SCORED 5-QUESTION MULTIPLE-CHOICE QUIZ DATASET
+     ***************************************************************************/
+    const QUIZ_QUESTIONS = [
+      {
+        id: 'q1',
+        topicTag: 'MOD-02 • Silicon & BOM',
+        question: 'In a flagship smartphone with an estimated $380.00 Bill of Materials (BOM), which removable sub-assembly accounts for the single largest share (~38% / $145) of the total hardware cost?',
+        options: [
+          '6.5" 120Hz LTPO OLED Display Assembly with Gorilla Glass Victus 2 ($85)',
+          'Dual-Stacked L-Shaped HDI Main Logic Board housing the 3nm SoC, 12GB LPDDR5X DRAM, UFS 4.0 NAND & 5G Modem ($145)',
+          'Triple Rear Camera Array with 50MP OIS Wide & 3x Periscope Telephoto ($64)',
+          'CNC 7000-Series Aluminum Mid-Frame with Integrated Copper Vapor Chamber ($28)'
+        ],
+        correctIndex: 1,
+        explanation: 'The Dual-Stacked HDI Main Logic Board ($145) represents nearly 40% of the entire smartphone BOM because it integrates leading-edge 3nm EUV silicon, high-speed LPDDR5X PoP memory, UFS 4.0 flash, and licensed 5G RF front-end modules.'
+      },
+      {
+        id: 'q2',
+        topicTag: 'MOD-08 • Thermal Engineering',
+        question: 'Why are Pyrolytic Graphite Sheets (PGS) applied over the battery and wireless coil characterized as "anisotropic" thermal conductors?',
+        options: [
+          'They conduct electricity in one direction like a semiconductor diode',
+          'Their thermal conductivity is ~100× higher in-plane (X-Y lateral spreading: ~1500 W/m·K) than through-plane (Z-axis thickness: ~15 W/m·K)',
+          'They only conduct heat when the smartphone temperature exceeds 45°C',
+          'They absorb infrared radiation without raising their own temperature'
+        ],
+        correctIndex: 1,
+        explanation: 'Hexagonal carbon graphene planes in Pyrolytic Graphite transfer phonons rapidly along the flat X-Y sheet (~1500 W/m·K) to spread heat over a wide area, while resisting Z-axis heat flow (~15 W/m·K) so a hot chip does not create a painful pinpoint hotspot on the rear glass.'
+      },
+      {
+        id: 'q3',
+        topicTag: 'MOD-05 • Battery Safety & Repair',
+        question: 'While replacing a 4800 mAh Li-Ion pouch cell, one of the stretch-release adhesive pull tabs tears off. What is the correct engineering repair procedure?',
+        options: [
+          'Wedge a flathead metal screwdriver under the cell corner to pop the acrylic glue loose',
+          'Heat the battery directly to 160°C with a hot-air rework station for 3 minutes',
+          'Apply a few drops of 99% Isopropyl Alcohol (IPA) along the battery edge to dissolve the adhesive bond and lift gently with a blunt nylon card',
+          'Pierce the outer black Mylar wrapper slightly to release trapped vacuum pressure'
+        ],
+        correctIndex: 2,
+        explanation: 'High-purity Isopropyl Alcohol (99% IPA) rapidly breaks down pressure-sensitive acrylic adhesive without mechanical or thermal stress. Prying with metal or heating a lithium pouch risks puncturing the separator and causing an immediate thermal runaway fire.'
+      },
+      {
+        id: 'q4',
+        topicTag: 'MOD-07 • USB-C Power Delivery',
+        question: 'Why do 45W–65W fast-charging smartphones use USB-PD Programmable Power Supply (PPS) at higher voltages (e.g., 9V–15V) over the USB-C cable before stepping it down inside the phone with a dual-phase switched-capacitor charge pump?',
+        options: [
+          'Lithium-ion cells natively operate at 15V DC without any internal conversion',
+          'Doubling the cable voltage cuts the required cable current in half for the same power, reducing I²R resistive heat loss in the USB-C pins and cable by 75% (4×)',
+          'Higher voltage prevents data interference on the USB 3.2 SuperSpeed differential pairs',
+          'USB-C receptacles cannot conduct currents above 1.0 Amp'
+        ],
+        correctIndex: 1,
+        explanation: 'Since resistive power loss is P_loss = I²R, delivering 45W at 15V @ 3A instead of 5V @ 9A reduces current by 3× and cable/connector heating by 9×. Inside the phone, a 2:1 or 4:1 switched-capacitor divider steps the voltage down to the battery’s 4.4V charging rail at >97% efficiency.'
+      },
+      {
+        id: 'q5',
+        topicTag: 'MOD-04 • Periscope Optics',
+        question: 'How does a smartphone camera achieve a 3x to 5x optical telephoto zoom (75mm–120mm equivalent focal length) inside a chassis that is only 8.2mm thick?',
+        options: [
+          'By digitally cropping the center of the main wide-angle sensor and upscaling with the NPU',
+          'By using a 90° right-angle glass prism that folds incoming light sideways along the internal width of the smartphone through a horizontal lens stack',
+          'By stacking five flat Fresnel plastic lenses directly on top of the rear sapphire cover',
+          'By moving the front selfie camera and rear camera simultaneously'
+        ],
+        correctIndex: 1,
+        explanation: 'A true 75mm–120mm optical focal length requires physical distance between lens elements and the CMOS sensor. By bouncing light 90° with a precision prism (a periscope layout), the lens barrel and voice-coil zoom group can lie horizontally inside the mid-frame.'
+      }
+    ];
+
+    /***************************************************************************
+     * 4. PERSISTENT APPLICATION STATE (WITH LOCALSTORAGE)
+     ***************************************************************************/
+    const STORAGE_KEY = 'hw_eng_402_revision_state_v1';
+
+    const defaultState = () => ({
+      courseTitle: 'Modern Smartphone Hardware & Architecture',
+      // Default exam target: +3 days from now
+      examTimestamp: Date.now() + 72 * 3600 * 1000,
+      completedTopicIds: ['t1', 't5'], // Pre-check 2 topics so the ring looks alive immediately
+      expandedTopicIds: ['t2'],        // Pre-expand 1 hard topic to showcase quick-revision notes
+      topicFilter: 'all',
+      // Flashcards state
+      fcOrder: FLASHCARDS_DATA.map((c) => c.id),
+      fcCurrentIndex: 0,
+      fcIsFlipped: false,
+      fcReviewOnly: false,
+      fcStatus: {
+        fc1: 'mastered',
+        fc2: 'review'
+      }, // id -> 'mastered' | 'review' | undefined
+      // Practice Quiz state
+      quizAnswers: {}, // { qId: selectedOptionIndex }
+      // Layout state
+      workspaceLayout: 'all', // 'all' | 'focus'
+      activeMobileTab: 'checklist' // 'checklist' | 'flashcards' | 'quiz'
+    });
+
+    let state = loadState();
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return defaultState();
+        const parsed = JSON.parse(raw);
+        return { ...defaultState(), ...parsed };
+      } catch (e) {
+        return defaultState();
+      }
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (e) {
+        // Ignore quota errors in restricted frames
+      }
+    }
+
+    /***************************************************************************
+     * 5. LIVE EXAM COUNTDOWN & URGENCY ENGINE
+     ***************************************************************************/
+    function formatDatetimeLocal(ts) {
+      const d = new Date(ts);
+      const pad = (n) => String(n).padStart(2, '0');
+      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    }
+
+    function setExamPresetHours(hours) {
+      state.examTimestamp = Date.now() + hours * 3600 * 1000;
+      document.getElementById('examDateInput').value = formatDatetimeLocal(state.examTimestamp);
+
+      document.querySelectorAll('.preset-time-btn').forEach((btn) => btn.classList.remove('pill-active-cyan'));
+      const activeBtn = document.getElementById(`presetBtn-${hours}`);
+      if (activeBtn) activeBtn.classList.add('pill-active-cyan');
+
+      saveState();
+      updateCountdownTick();
+      showToast(`Target Exam Window Set: +${hours >= 24 ? (hours / 24) + ' Days' : hours + ' Hours'}`);
+    }
+
+    function handleCustomExamDate(val) {
+      if (!val) return;
+      const parsed = new Date(val).getTime();
+      if (!isNaN(parsed)) {
+        state.examTimestamp = parsed;
+        document.querySelectorAll('.preset-time-btn').forEach((btn) => btn.classList.remove('pill-active-cyan'));
+        saveState();
+        updateCountdownTick();
+        showToast('Custom Exam Date & Time Updated');
+      }
+    }
+
+    function updateCountdownTick() {
+      const now = Date.now();
+      const diffMs = Math.max(0, state.examTimestamp - now);
+
+      const totalSecs = Math.floor(diffMs / 1000);
+      const days = Math.floor(totalSecs / 86400);
+      const hours = Math.floor((totalSecs % 86400) / 3600);
+      const minutes = Math.floor((totalSecs % 3600) / 60);
+      const seconds = totalSecs % 60;
+
+      const pad = (n) => String(n).padStart(2, '0');
+      document.getElementById('cdDays').textContent = pad(days);
+      document.getElementById('cdHours').textContent = pad(hours);
+      document.getElementById('cdMinutes').textContent = pad(minutes);
+      document.getElementById('cdSeconds').textContent = pad(seconds);
+
+      // Update Urgency Badge & Advice based on hours remaining
+      const hoursLeft = diffMs / (1000 * 3600);
+      const badge = document.getElementById('urgencyBadge');
+      const advice = document.getElementById('urgencyAdviceText');
+
+      if (diffMs === 0) {
+        badge.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold bg-rose-500/25 text-rose-300 border border-rose-400/50';
+        badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-400 animate-ping"></span> EXAM IN PROGRESS / PAST`;
+        advice.innerHTML = `Exam time reached! Pick a new preset timeframe above to start another revision cycle.`;
+      } else if (hoursLeft <= 28) {
+        badge.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold bg-rose-500/20 text-rose-300 border border-rose-400/50';
+        badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-400 animate-ping"></span> CRITICAL URGENCY // FINAL 24H SPRINT`;
+        advice.innerHTML = `<strong class="text-rose-400">Final Sprint Strategy:</strong> Prioritize the 2 <span class="text-rose-300 font-semibold">Hard</span> topics (3nm SoC & HDI PCB), drill "Need Review" 3D flashcards, and complete the 5-question quiz.`;
+      } else if (hoursLeft <= 96) {
+        badge.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-400/40';
+        badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span> HIGH PRIORITY // ACTIVE REVISION WINDOW`;
+        advice.innerHTML = `<strong class="text-amber-300">Pacing Advice:</strong> Aim to complete 3 syllabus modules per day and test your recall with the 3D Flashcard deck after each 25m Pomodoro session.`;
+      } else {
+        badge.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-400/40';
+        badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span> STEADY PACE // STRUCTURED STUDY WINDOW`;
+        advice.innerHTML = `<strong class="text-emerald-300">Structured Pace:</strong> Expand each syllabus topic below to study the formulas and repair rules thoroughly before attempting the practice exam.`;
+      }
+    }
+
+    /***************************************************************************
+     * 6. MASTER PROGRESS RING & READINESS SCORE TELEMETRY
+     ***************************************************************************/
+    function updateMasterTelemetry() {
+      // 1. Syllabus Checklist %
+      const totalTopics = SYLLABUS_TOPICS.length;
+      const doneTopics = state.completedTopicIds.length;
+      const topicPct = Math.round((doneTopics / totalTopics) * 100);
+
+      // Hard topics counter
+      const hardTopics = SYLLABUS_TOPICS.filter((t) => t.difficulty === 'Hard');
+      const doneHard = hardTopics.filter((t) => state.completedTopicIds.includes(t.id)).length;
+
+      // 2. Flashcards Mastered %
+      const totalCards = FLASHCARDS_DATA.length;
+      let masteredCards = 0;
+      let reviewCards = 0;
+      Object.values(state.fcStatus).forEach((st) => {
+        if (st === 'mastered') masteredCards++;
+        if (st === 'review') reviewCards++;
+      });
+      const fcPct = Math.round((masteredCards / totalCards) * 100);
+
+      // 3. Practice Quiz Score %
+      const totalQuiz = QUIZ_QUESTIONS.length;
+      let correctQuiz = 0;
+      QUIZ_QUESTIONS.forEach((q) => {
+        if (state.quizAnswers[q.id] === q.correctIndex) correctQuiz++;
+      });
+      const quizPct = Math.round((correctQuiz / totalQuiz) * 100);
+
+      // Update SVG Ring (Circumference = 2 * PI * 50 = 314.16)
+      const circumference = 314.16;
+      const offset = circumference - (topicPct / 100) * circumference;
+      const circleEl = document.getElementById('masterProgressCircle');
+      circleEl.style.strokeDashoffset = offset;
+      circleEl.style.stroke = topicPct === 100 ? '#10b981' : '#00f0ff';
+
+      document.getElementById('ringPercentText').textContent = `${topicPct}%`;
+
+      // Update Checklist Linear Bar & Labels
+      document.getElementById('statChecklistCount').textContent = `${doneTopics} / ${totalTopics}`;
+      document.getElementById('barChecklist').style.width = `${topicPct}%`;
+      document.getElementById('checklistProgressLabel').textContent = `${topicPct}% Completed (${doneTopics}/${totalTopics})`;
+      document.getElementById('checklistLinearBar').style.width = `${topicPct}%`;
+
+      // Update Flashcard & Quiz Bars
+      document.getElementById('statFlashcardsCount').textContent = `${masteredCards} / ${totalCards}`;
+      document.getElementById('barFlashcards').style.width = `${fcPct}%`;
+
+      document.getElementById('statQuizScore').textContent = `${correctQuiz} / ${totalQuiz}`;
+      document.getElementById('barQuiz').style.width = `${quizPct}%`;
+
+      // Combined Readiness Index (45% Syllabus + 30% Flashcards + 25% Quiz)
+      const readinessIndex = Math.round(topicPct * 0.45 + fcPct * 0.30 + quizPct * 0.25);
+      const readyBadge = document.getElementById('readinessGradeBadge');
+      readyBadge.textContent = `READY INDEX: ${readinessIndex}%`;
+      if (readinessIndex >= 80) {
+        readyBadge.className = 'px-2.5 py-1 rounded-lg font-mono text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40';
+      } else if (readinessIndex >= 45) {
+        readyBadge.className = 'px-2.5 py-1 rounded-lg font-mono text-xs font-bold bg-cyan-500/15 text-cyan-300 border border-cyan-500/30';
+      } else {
+        readyBadge.className = 'px-2.5 py-1 rounded-lg font-mono text-xs font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30';
+      }
+
+      document.getElementById('statHardTopics').textContent = `${doneHard}/${hardTopics.length}`;
+      document.getElementById('needReviewAlert').textContent = `${reviewCards} Card${reviewCards === 1 ? '' : 's'} Marked for Review`;
+    }
+
+    /***************************************************************************
+     * 7. MODULE 01: INTERACTIVE SYLLABUS CHECKLIST & ACCORDION NOTES
+     ***************************************************************************/
+    function setTopicFilter(filterVal) {
+      state.topicFilter = filterVal;
+      document.querySelectorAll('.topic-filter-pill').forEach((btn) => {
+        btn.classList.toggle('pill-active-cyan', btn.getAttribute('data-filter') === filterVal);
+      });
+      saveState();
+      renderTopicsList();
+    }
+
+    function toggleTopicCompleted(topicId, event) {
+      if (event) event.stopPropagation();
+      const idx = state.completedTopicIds.indexOf(topicId);
+      const topic = SYLLABUS_TOPICS.find((t) => t.id === topicId);
+      if (idx === -1) {
+        state.completedTopicIds.push(topicId);
+        showToast(`Completed: ${topic.code} (${topic.title})`);
+      } else {
+        state.completedTopicIds.splice(idx, 1);
+      }
+      saveState();
+      updateMasterTelemetry();
+      renderTopicsList();
+    }
+
+    function toggleTopicExpanded(topicId) {
+      const idx = state.expandedTopicIds.indexOf(topicId);
+      if (idx === -1) {
+        state.expandedTopicIds.push(topicId);
+      } else {
+        state.expandedTopicIds.splice(idx, 1);
+      }
+      saveState();
+      renderTopicsList();
+    }
+
+    function markAllTopics(completeAll) {
+      state.completedTopicIds = completeAll ? SYLLABUS_TOPICS.map((t) => t.id) : [];
+      saveState();
+      updateMasterTelemetry();
+      renderTopicsList();
+      showToast(completeAll ? 'All 9 Syllabus Topics Marked Completed!' : 'Cleared Syllabus Completion Checkboxes');
+    }
+
+    function renderTopicsList() {
+      const container = document.getElementById('topicsListContainer');
+      const query = (document.getElementById('topicSearchInput')?.value || '').trim().toLowerCase();
+
+      const filtered = SYLLABUS_TOPICS.filter((t) => {
+        const isDone = state.completedTopicIds.includes(t.id);
+        if (state.topicFilter === 'pending' && isDone) return false;
+        if (state.topicFilter === 'completed' && !isDone) return false;
+        if (state.topicFilter === 'Hard' && t.difficulty !== 'Hard') return false;
+
+        if (query) {
+          const hay = `${t.code} ${t.title} ${t.category} ${t.summary} ${t.notes.join(' ')} ${t.formula}`.toLowerCase();
+          return hay.includes(query);
+        }
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="p-8 text-center rounded-xl border border-dashed border-slate-800 text-xs font-mono text-slate-400">
+            No syllabus topics match the current filter.
+          </div>
+        `;
+        return;
+      }
+
+      const diffBadgeStyle = {
+        Easy: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
+        Medium: 'bg-amber-500/15 text-amber-300 border-amber-500/30',
+        Hard: 'bg-rose-500/20 text-rose-300 border-rose-500/40'
+      };
+
+      container.innerHTML = filtered.map((t) => {
+        const isDone = state.completedTopicIds.includes(t.id);
+        const isExpanded = state.expandedTopicIds.includes(t.id);
+
+        return `
+          <div class="rounded-xl border transition ${
+            isDone
+              ? 'bg-emerald-950/15 border-emerald-500/35'
+              : 'bg-slate-900/75 hover:bg-slate-900 border-slate-800'
+          }">
+            <!-- Topic Header Row -->
+            <div class="p-3.5 flex items-start justify-between gap-3 cursor-pointer" onclick="toggleTopicExpanded('${t.id}')">
+              <!-- Custom Checkbox + Title -->
+              <div class="flex items-start gap-3 min-w-0">
+                <label class="relative flex items-center cursor-pointer mt-0.5 shrink-0" onclick="event.stopPropagation()">
+                  <input
+                    type="checkbox"
+                    class="sr-only topic-checkbox"
+                    ${isDone ? 'checked' : ''}
+                    onchange="toggleTopicCompleted('${t.id}', event)"
+                  />
+                  <div class="w-5 h-5 rounded-md border-2 border-slate-600 bg-slate-950 flex items-center justify-center transition-colors">
+                    <svg class="w-3.5 h-3.5 text-slate-950 opacity-0 transform scale-50 transition-all duration-150" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                      <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                  </div>
+                </label>
+
+                <div class="min-w-0">
+                  <div class="flex flex-wrap items-center gap-1.5 mb-1">
+                    <span class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-cyan-400 font-bold">${t.code}</span>
+                    <span class="font-mono text-[10px] px-2 py-0.5 rounded-full border font-semibold ${diffBadgeStyle[t.difficulty]}">${t.difficulty}</span>
+                    <span class="font-mono text-[10px] text-slate-400">${t.category} • ${t.examWeight}</span>
+                  </div>
+                  <h3 class="text-sm font-bold ${isDone ? 'line-through text-slate-400' : 'text-white'} leading-snug">
+                    ${t.title}
+                  </h3>
+                  <p class="text-xs text-slate-400 mt-1 line-clamp-2">${t.summary}</p>
+                </div>
+              </div>
+
+              <!-- Expand Notes Button -->
+              <button
+                class="px-2 py-1 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-[10px] font-mono text-cyan-300 border border-slate-700 shrink-0 flex items-center gap-1 transition"
+                title="Toggle Quick-Revision Notes"
+              >
+                <span>${isExpanded ? 'Hide Notes' : 'Notes'}</span>
+                <svg class="w-3 h-3 transform transition-transform ${isExpanded ? 'rotate-180' : ''}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <polyline points="6 9 12 15 18 9"/>
+                </svg>
+              </button>
+            </div>
+
+            <!-- Expandable Quick-Revision Notes Accordion -->
+            ${
+              isExpanded
+                ? `<div class="px-4 pb-4 pt-2 border-t border-slate-800/80 bg-slate-950/60 space-y-2.5 rounded-b-xl">
+                    <div class="text-[10px] font-mono uppercase tracking-wider text-cyan-400 font-semibold">High-Yield Exam Revision Notes:</div>
+                    <ul class="space-y-1.5 text-xs text-slate-300 list-disc pl-4 leading-relaxed">
+                      ${t.notes.map((n) => `<li>${n}</li>`).join('')}
+                    </ul>
+                    <div class="p-2.5 rounded-lg bg-slate-900 border border-cyan-500/30 font-mono text-[11px] text-cyan-300 flex items-center justify-between gap-2">
+                      <span><strong>KEY EQUATION / SPEC:</strong> ${t.formula}</span>
+                    </div>
+                  </div>`
+                : ''
+            }
+          </div>
+        `;
+      }).join('');
+    }
+
+    /***************************************************************************
+     * 8. MODULE 02: 3D INTERACTIVE FLASHCARDS DECK LOGIC
+     ***************************************************************************/
+    function getFilteredFlashcardList() {
+      const ordered = state.fcOrder.map((id) => FLASHCARDS_DATA.find((c) => c.id === id)).filter(Boolean);
+      if (state.fcReviewOnly) {
+        const rev = ordered.filter((c) => state.fcStatus[c.id] === 'review');
+        return rev.length > 0 ? rev : ordered;
+      }
+      return ordered;
+    }
+
+    function renderFlashcard() {
+      const deck = getFilteredFlashcardList();
+      if (state.fcCurrentIndex >= deck.length) state.fcCurrentIndex = 0;
+      if (state.fcCurrentIndex < 0) state.fcCurrentIndex = deck.length - 1;
+
+      const card = deck[state.fcCurrentIndex];
+      const innerEl = document.getElementById('flashcard3DInner');
+      innerEl.classList.toggle('rotate-y-180', state.fcIsFlipped);
+
+      document.getElementById('fcPositionCounter').textContent = `CARD 0${state.fcCurrentIndex + 1} OF 0${deck.length}`;
+      document.getElementById('fcFrontCategory').textContent = card.category;
+      document.getElementById('fcFrontQuestion').textContent = card.question;
+      document.getElementById('fcBackAnswer').textContent = card.answer;
+      document.getElementById('fcBackKeyPoint').textContent = card.keyPoint;
+
+      // Status badge on card front
+      const st = state.fcStatus[card.id];
+      const badgeEl = document.getElementById('fcFrontStatusBadge');
+      if (st === 'mastered') {
+        badgeEl.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-mono uppercase font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-400/50';
+        badgeEl.textContent = '✓ Mastered';
+      } else if (st === 'review') {
+        badgeEl.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-mono uppercase font-bold bg-amber-500/20 text-amber-300 border border-amber-400/50';
+        badgeEl.textContent = '⚑ Needs Review';
+      } else {
+        badgeEl.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-mono uppercase bg-slate-800 text-slate-400 border border-slate-700';
+        badgeEl.textContent = 'Unseen';
+      }
+
+      // Update counters
+      let mastered = 0, review = 0;
+      Object.values(state.fcStatus).forEach((v) => {
+        if (v === 'mastered') mastered++;
+        if (v === 'review') review++;
+      });
+      document.getElementById('fcGotItCount').textContent = mastered;
+      document.getElementById('fcReviewCount').textContent = review;
+
+      const revFilterBtn = document.getElementById('fcFilterReviewBtn');
+      revFilterBtn.textContent = `Need Review Only (${review})`;
+      revFilterBtn.classList.toggle('pill-active-cyan', state.fcReviewOnly);
+    }
+
+    function flipCurrentFlashcard() {
+      state.fcIsFlipped = !state.fcIsFlipped;
+      renderFlashcard();
+    }
+
+    function nextFlashcard() {
+      const deck = getFilteredFlashcardList();
+      state.fcIsFlipped = false;
+      state.fcCurrentIndex = (state.fcCurrentIndex + 1) % deck.length;
+      renderFlashcard();
+    }
+
+    function prevFlashcard() {
+      const deck = getFilteredFlashcardList();
+      state.fcIsFlipped = false;
+      state.fcCurrentIndex = (state.fcCurrentIndex - 1 + deck.length) % deck.length;
+      renderFlashcard();
+    }
+
+    function markFlashcardStatus(status) {
+      const deck = getFilteredFlashcardList();
+      const card = deck[state.fcCurrentIndex];
+      if (!card) return;
+
+      state.fcStatus[card.id] = status;
+      state.fcIsFlipped = false;
+
+      // Auto-turned off review filter if no review cards remain
+      const remainingReview = Object.values(state.fcStatus).filter((v) => v === 'review').length;
+      if (state.fcReviewOnly && remainingReview === 0) {
+        state.fcReviewOnly = false;
+      }
+
+      // Advance to next card smoothly
+      const updatedDeck = getFilteredFlashcardList();
+      state.fcCurrentIndex = (state.fcCurrentIndex + 1) % updatedDeck.length;
+
+      saveState();
+      updateMasterTelemetry();
+      renderFlashcard();
+      showToast(status === 'mastered' ? 'Card marked "Got It!" (+Mastery)' : 'Card flagged for "Need Review"');
+    }
+
+    function shuffleFlashcards() {
+      const arr = [...state.fcOrder];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      state.fcOrder = arr;
+      state.fcCurrentIndex = 0;
+      state.fcIsFlipped = false;
+      saveState();
+      renderFlashcard();
+      showToast('3D Flashcard Deck Shuffled');
+    }
+
+    function toggleFlashcardReviewFilter() {
+      const reviewCount = Object.values(state.fcStatus).filter((v) => v === 'review').length;
+      if (!state.fcReviewOnly && reviewCount === 0) {
+        showToast('No cards currently flagged "Need Review"');
+        return;
+      }
+      state.fcReviewOnly = !state.fcReviewOnly;
+      state.fcCurrentIndex = 0;
+      state.fcIsFlipped = false;
+      renderFlashcard();
+    }
+
+    /***************************************************************************
+     * 9. MODULE 03: SCORED 5-QUESTION MULTIPLE-CHOICE PRACTICE QUIZ
+     ***************************************************************************/
+    function selectQuizAnswer(qId, optionIdx) {
+      state.quizAnswers[qId] = optionIdx;
+      saveState();
+      updateMasterTelemetry();
+      renderPracticeQuiz();
+
+      const q = QUIZ_QUESTIONS.find((item) => item.id === qId);
+      if (q) {
+        if (optionIdx === q.correctIndex) {
+          showToast('✓ Correct Answer! +1 Quiz Score');
+        } else {
+          showToast('✕ Incorrect — Review the technical explanation below');
+        }
+      }
+    }
+
+    function retakePracticeQuiz() {
+      state.quizAnswers = {};
+      saveState();
+      updateMasterTelemetry();
+      renderPracticeQuiz();
+      showToast('Practice Quiz Reset — Ready for a fresh attempt!');
+    }
+
+    function renderPracticeQuiz() {
+      let correctCount = 0;
+      let answeredCount = 0;
+      QUIZ_QUESTIONS.forEach((q) => {
+        if (state.quizAnswers[q.id] !== undefined) {
+          answeredCount++;
+          if (state.quizAnswers[q.id] === q.correctIndex) correctCount++;
+        }
+      });
+
+      document.getElementById('quizScoreHeader').textContent = `${correctCount} / ${QUIZ_QUESTIONS.length}`;
+
+      const container = document.getElementById('quizQuestionsContainer');
+      container.innerHTML = QUIZ_QUESTIONS.map((q, idx) => {
+        const selected = state.quizAnswers[q.id];
+        const isAnswered = selected !== undefined;
+        const isCorrect = selected === q.correctIndex;
+
+        return `
+          <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 space-y-3">
+            <div class="flex items-center justify-between gap-2">
+              <span class="px-2 py-0.5 rounded bg-amber-500/15 border border-amber-500/30 text-amber-300 font-mono text-[10px] font-bold">
+                QUESTION 0${idx + 1} // ${q.topicTag}
+              </span>
+              ${
+                isAnswered
+                  ? `<span class="font-mono text-[11px] font-bold ${isCorrect ? 'text-emerald-400' : 'text-rose-400'}">
+                      ${isCorrect ? '✓ +1 PT' : '✕ 0 PT'}
+                    </span>`
+                  : `<span class="font-mono text-[10px] text-slate-500">Unanswered</span>`
+              }
+            </div>
+
+            <h3 class="text-xs sm:text-sm font-bold text-white leading-snug">${q.question}</h3>
+
+            <div class="space-y-2">
+              ${q.options.map((optText, oIdx) => {
+                let optClass = 'bg-slate-950/85 hover:bg-slate-800/90 border-slate-800 text-slate-300';
+                let badge = String.fromCharCode(65 + oIdx);
+
+                if (isAnswered) {
+                  if (oIdx === q.correctIndex) {
+                    optClass = 'bg-emerald-500/20 border-emerald-400 text-emerald-100 font-medium';
+                  } else if (oIdx === selected) {
+                    optClass = 'bg-rose-500/20 border-rose-400 text-rose-200';
+                  } else {
+                    optClass = 'bg-slate-950/40 border-slate-800/50 text-slate-500';
+                  }
+                }
+
+                return `
+                  <button
+                    onclick="selectQuizAnswer('${q.id}', ${oIdx})"
+                    class="w-full text-left p-2.5 sm:p-3 rounded-xl border text-xs transition flex items-start justify-between gap-2.5 ${optClass}"
+                  >
+                    <div class="flex items-start gap-2.5">
+                      <span class="w-5 h-5 rounded-md bg-slate-900 border border-slate-700 font-mono text-[11px] font-bold flex items-center justify-center shrink-0 mt-0.5">
+                        ${badge}
+                      </span>
+                      <span class="leading-relaxed">${optText}</span>
+                    </div>
+                    ${isAnswered && oIdx === q.correctIndex ? '<span class="text-emerald-400 font-mono font-bold shrink-0">✓</span>' : ''}
+                    ${isAnswered && oIdx === selected && oIdx !== q.correctIndex ? '<span class="text-rose-400 font-mono font-bold shrink-0">✕</span>' : ''}
+                  </button>
+                `;
+              }).join('')}
+            </div>
+
+            ${
+              isAnswered
+                ? `<div class="p-3 rounded-xl text-xs leading-relaxed border ${
+                    isCorrect
+                      ? 'bg-emerald-950/35 border-emerald-500/40 text-emerald-200'
+                      : 'bg-amber-950/35 border-amber-500/40 text-amber-200'
+                  }">
+                    <strong class="font-mono uppercase block mb-0.5">${isCorrect ? '✓ Engineering Explanation:' : '💡 Why Option ' + String.fromCharCode(65 + q.correctIndex) + ' is Correct:'}</strong>
+                    ${q.explanation}
+                  </div>`
+                : ''
+            }
+          </div>
+        `;
+      }).join('');
+    }
+
+    /***************************************************************************
+     * 10. STUDY POMODORO FOCUS TIMER (WITH WEB AUDIO CHIME)
+     ***************************************************************************/
+    const POMODORO_MODES = {
+      focus: 25 * 60,
+      short: 5 * 60,
+      long: 15 * 60
+    };
+    let pomoCurrentMode = 'focus';
+    let pomoRemainingSecs = POMODORO_MODES.focus;
+    let pomoInterval = null;
+    let pomoRunning = false;
+
+    function renderPomodoroTime() {
+      const mins = Math.floor(pomoRemainingSecs / 60);
+      const secs = pomoRemainingSecs % 60;
+      document.getElementById('pomoTimeDisplay').textContent =
+        `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    }
+
+    function setPomodoroMode(mode) {
+      pausePomodoro();
+      pomoCurrentMode = mode;
+      pomoRemainingSecs = POMODORO_MODES[mode];
+      ['focus', 'short', 'long'].forEach((m) => {
+        const btn = document.getElementById(`pomoMode-${m}`);
+        if (btn) btn.classList.toggle('pill-active-cyan', m === mode);
+      });
+      renderPomodoroTime();
+    }
+
+    function togglePomodoro() {
+      if (pomoRunning) {
+        pausePomodoro();
+      } else {
+        startPomodoro();
+      }
+    }
+
+    function startPomodoro() {
+      pomoRunning = true;
+      document.getElementById('pomoToggleText').textContent = 'Pause';
+      document.getElementById('pomoStatusDot').className = 'w-2 h-2 rounded-full bg-emerald-400 animate-ping';
+      pomoInterval = setInterval(() => {
+        if (pomoRemainingSecs > 0) {
+          pomoRemainingSecs--;
+          renderPomodoroTime();
+        } else {
+          pausePomodoro();
+          playPomodoroChime();
+          showToast('🔔 Pomodoro Session Complete! Take a well-earned break.');
+        }
+      }, 1000);
+    }
+
+    function pausePomodoro() {
+      pomoRunning = false;
+      clearInterval(pomoInterval);
+      document.getElementById('pomoToggleText').textContent = 'Start';
+      document.getElementById('pomoStatusDot').className = 'w-2 h-2 rounded-full bg-cyan-400';
+    }
+
+    function resetPomodoro() {
+      pausePomodoro();
+      pomoRemainingSecs = POMODORO_MODES[pomoCurrentMode];
+      renderPomodoroTime();
+      showToast('Pomodoro Timer Reset');
+    }
+
+    function playPomodoroChime() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        [523.25, 659.25, 783.99].forEach((freq, idx) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.value = freq;
+          gain.gain.setValueAtTime(0.08, ctx.currentTime + idx * 0.18);
+          gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + idx * 0.18 + 0.55);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(ctx.currentTime + idx * 0.18);
+          osc.stop(ctx.currentTime + idx * 0.18 + 0.6);
+        });
+      } catch (e) {
+        // Ignore audio errors if blocked
+      }
+    }
+
+    /***************************************************************************
+     * 11. WORKSPACE LAYOUT SWITCHER, MODALS & KEYBOARD SHORTCUTS
+     ***************************************************************************/
+    function setWorkspaceLayout(mode) {
+      state.workspaceLayout = mode;
+      document.getElementById('layoutBtn-all').classList.toggle('pill-active-cyan', mode === 'all');
+      document.getElementById('layoutBtn-focus').classList.toggle('pill-active-cyan', mode === 'focus');
+
+      const navBar = document.getElementById('moduleTabsNav');
+      if (mode === 'focus') {
+        navBar.classList.remove('xl:hidden');
+        switchActiveModuleTab(state.activeMobileTab);
+      } else {
+        navBar.classList.add('xl:hidden');
+        document.getElementById('sectionChecklist').classList.remove('hidden');
+        document.getElementById('rightColumnStack').classList.remove('hidden');
+        document.getElementById('sectionFlashcards').classList.remove('hidden');
+        document.getElementById('sectionQuiz').classList.remove('hidden');
+        document.getElementById('sectionChecklist').className = 'xl:col-span-6 bg-[#0d1322]/90 border border-slate-800/90 rounded-2xl flex flex-col shadow-xl overflow-hidden';
+        document.getElementById('rightColumnStack').className = 'xl:col-span-6 space-y-6';
+      }
+    }
+
+    function switchActiveModuleTab(tab) {
+      state.activeMobileTab = tab;
+      ['checklist', 'flashcards', 'quiz'].forEach((t) => {
+        const btn = document.getElementById(`modTab-${t}`);
+        if (btn) btn.classList.toggle('pill-active-cyan', t === tab);
+      });
+
+      const secChecklist = document.getElementById('sectionChecklist');
+      const rightStack = document.getElementById('rightColumnStack');
+      const secFc = document.getElementById('sectionFlashcards');
+      const secQuiz = document.getElementById('sectionQuiz');
+
+      const isSingleTabView = window.innerWidth < 1280 || state.workspaceLayout === 'focus';
+      if (!isSingleTabView) return;
+
+      if (tab === 'checklist') {
+        secChecklist.classList.remove('hidden');
+        secChecklist.className = 'xl:col-span-12 bg-[#0d1322]/90 border border-slate-800/90 rounded-2xl flex flex-col shadow-xl overflow-hidden';
+        rightStack.classList.add('hidden');
+      } else if (tab === 'flashcards') {
+        secChecklist.classList.add('hidden');
+        rightStack.classList.remove('hidden');
+        rightStack.className = 'xl:col-span-12 space-y-6';
+        secFc.classList.remove('hidden');
+        secQuiz.classList.add('hidden');
+      } else if (tab === 'quiz') {
+        secChecklist.classList.add('hidden');
+        rightStack.classList.remove('hidden');
+        rightStack.className = 'xl:col-span-12 space-y-6';
+        secFc.classList.add('hidden');
+        secQuiz.classList.remove('hidden');
+      }
+    }
+
+    function promptEditTitle() {
+      document.getElementById('customTitleInput').value = state.courseTitle;
+      document.getElementById('editTitleModal').classList.remove('hidden');
+      setTimeout(() => document.getElementById('customTitleInput').focus(), 50);
+    }
+
+    function closeEditTitleModal() {
+      document.getElementById('editTitleModal').classList.add('hidden');
+    }
+
+    function saveCustomTitle() {
+      const val = document.getElementById('customTitleInput').value.trim();
+      if (val) {
+        state.courseTitle = val;
+        document.getElementById('courseTitleDisplay').textContent = val;
+        saveState();
+        showToast('Updated Exam Subject Title');
+      }
+      closeEditTitleModal();
+    }
+
+    function openResetModal() {
+      document.getElementById('resetModal').classList.remove('hidden');
+    }
+
+    function closeResetModal() {
+      document.getElementById('resetModal').classList.add('hidden');
+    }
+
+    function confirmResetAllProgress() {
+      localStorage.removeItem(STORAGE_KEY);
+      state = {
+        ...defaultState(),
+        completedTopicIds: [],
+        fcStatus: {},
+        quizAnswers: {}
+      };
+      saveState();
+      closeResetModal();
+      initDashboardUI();
+      showToast('All Study Progress Reset to 0%');
+    }
+
+    let toastTimer = null;
+    function showToast(msg) {
+      const banner = document.getElementById('toastBanner');
+      document.getElementById('toastMessage').textContent = msg;
+      banner.classList.remove('opacity-0', 'translate-y-2');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        banner.classList.add('opacity-0', 'translate-y-2');
+      }, 2500);
+    }
+
+    // Spacebar to flip flashcard when not typing in an input
+    window.addEventListener('keydown', (e) => {
+      const tag = document.activeElement?.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+      if (e.code === 'Space') {
+        e.preventDefault();
+        flipCurrentFlashcard();
+      } else if (e.code === 'ArrowRight') {
+        nextFlashcard();
+      } else if (e.code === 'ArrowLeft') {
+        prevFlashcard();
+      }
+    });
+
+    window.addEventListener('resize', () => {
+      if (window.innerWidth >= 1280 && state.workspaceLayout === 'all') {
+        setWorkspaceLayout('all');
+      } else {
+        switchActiveModuleTab(state.activeMobileTab);
+      }
+    });
+
+    function initDashboardUI() {
+      document.getElementById('courseTitleDisplay').textContent = state.courseTitle;
+      document.getElementById('examDateInput').value = formatDatetimeLocal(state.examTimestamp);
+
+      updateCountdownTick();
+      updateMasterTelemetry();
+      renderTopicsList();
+      renderFlashcard();
+      renderPracticeQuiz();
+      renderPomodoroTime();
+
+      if (window.innerWidth < 1280) {
+        switchActiveModuleTab(state.activeMobileTab);
+      }
+    }
+
+    window.onload = function () {
+      initDashboardUI();
+      setInterval(updateCountdownTick, 1000);
+    };
+  </script>
+</body>
+</html>

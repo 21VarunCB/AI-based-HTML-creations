@@ -1,0 +1,1653 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>PhoneMatch Pro // Interactive Smartphone Decision Helper & Live Comparator</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            surface: '#0b0f19',
+            card: '#111827',
+            cardHover: '#161f33',
+            borderSubtle: '#1e293b',
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: #070a12;
+      color: #f1f5f9;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-image:
+        radial-gradient(circle at 12% 8%, rgba(99, 102, 241, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 88% 15%, rgba(14, 165, 233, 0.10) 0%, transparent 42%),
+        radial-gradient(circle at 50% 90%, rgba(16, 185, 129, 0.07) 0%, transparent 45%);
+      min-height: 100vh;
+    }
+
+    /* Custom Range Sliders */
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 7px;
+      background: #1e293b;
+      border-radius: 999px;
+      outline: none;
+      cursor: pointer;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 3px solid #6366f1;
+      box-shadow: 0 0 12px rgba(99, 102, 241, 0.65);
+      cursor: pointer;
+      transition: transform 0.15s ease, border-color 0.15s ease;
+    }
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+    }
+    input[type="range"].slider-camera::-webkit-slider-thumb { border-color: #f43f5e; box-shadow: 0 0 12px rgba(244,63,94,0.6); }
+    input[type="range"].slider-battery::-webkit-slider-thumb { border-color: #10b981; box-shadow: 0 0 12px rgba(16,185,129,0.6); }
+    input[type="range"].slider-gaming::-webkit-slider-thumb { border-color: #a855f7; box-shadow: 0 0 12px rgba(168,85,247,0.6); }
+    input[type="range"].slider-display::-webkit-slider-thumb { border-color: #06b6d4; box-shadow: 0 0 12px rgba(6,182,212,0.6); }
+    input[type="range"].slider-value::-webkit-slider-thumb { border-color: #f59e0b; box-shadow: 0 0 12px rgba(245,158,11,0.6); }
+    input[type="range"].slider-budget::-webkit-slider-thumb { border-color: #38bdf8; box-shadow: 0 0 12px rgba(56,189,248,0.6); }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #070a12;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1e293b;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #6366f1;
+    }
+
+    /* Smooth Card Transitions */
+    .phone-card-transition {
+      transition: all 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    /* Active Persona / Filter Pill */
+    .persona-active {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.25), rgba(14, 165, 233, 0.2)) !important;
+      border-color: #818cf8 !important;
+      color: #ffffff !important;
+      box-shadow: 0 0 18px rgba(99, 102, 241, 0.25);
+    }
+
+    .musthave-active {
+      background: rgba(16, 185, 129, 0.18) !important;
+      border-color: #34d399 !important;
+      color: #ecfdf5 !important;
+      box-shadow: 0 0 14px rgba(16, 185, 129, 0.2);
+    }
+  </style>
+</head>
+<body class="flex flex-col min-h-screen selection:bg-indigo-500 selection:text-white">
+
+  <!-- ==================== STICKY TOP HEADER ==================== -->
+  <header class="sticky top-0 z-40 bg-[#070a12]/90 backdrop-blur-xl border-b border-slate-800/80 px-4 lg:px-8 py-3">
+    <div class="max-w-[1600px] mx-auto flex flex-wrap items-center justify-between gap-3">
+
+      <!-- Brand & Subtitle -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-600 via-sky-500 to-emerald-400 p-[1.5px] shadow-lg shadow-indigo-500/20">
+          <div class="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center">
+            <svg class="w-5 h-5 text-sky-400" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <rect x="6" y="2" width="12" height="20" rx="2.5" />
+              <path d="M10 18h4M9 6h6" />
+            </svg>
+          </div>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-[11px] font-mono uppercase tracking-widest text-indigo-400 font-bold">2026 BUYER'S LAB // RTINGS × MKBHD MATRIX</span>
+            <span class="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              Live Rank Engine
+            </span>
+          </div>
+          <h1 class="text-base sm:text-xl font-extrabold text-white tracking-tight">
+            Smartphone Decision Helper & Live Comparator
+          </h1>
+        </div>
+      </div>
+
+      <!-- Right Controls: Currency Toggle, Head-to-Head Arena Button & Reset -->
+      <div class="flex flex-wrap items-center gap-2.5">
+        <!-- Currency Switcher -->
+        <div class="flex items-center bg-slate-900/95 border border-slate-800 rounded-xl p-1 text-xs font-mono" role="group" aria-label="Currency selector">
+          <button onclick="setCurrency('USD')" id="currBtn-USD" class="px-2.5 py-1 rounded-lg font-bold transition bg-indigo-600 text-white">$ USD</button>
+          <button onclick="setCurrency('INR')" id="currBtn-INR" class="px-2.5 py-1 rounded-lg font-bold text-slate-400 hover:text-white transition">₹ INR</button>
+          <button onclick="setCurrency('EUR')" id="currBtn-EUR" class="px-2.5 py-1 rounded-lg font-bold text-slate-400 hover:text-white transition">€ EUR</button>
+          <button onclick="setCurrency('GBP')" id="currBtn-GBP" class="px-2.5 py-1 rounded-lg font-bold text-slate-400 hover:text-white transition">£ GBP</button>
+        </div>
+
+        <!-- Open Head-to-Head Compare Modal Button -->
+        <button
+          onclick="openCompareModal()"
+          class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-sky-500 hover:from-indigo-500 hover:to-sky-400 text-white font-semibold text-xs sm:text-sm shadow-lg shadow-indigo-500/25 transition"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/>
+          </svg>
+          <span>Head-to-Head Compare</span>
+          <span id="compareTrayBadge" class="px-1.5 py-0.5 rounded-md bg-slate-950/70 font-mono text-[11px] text-sky-300">2 Selected</span>
+        </button>
+
+        <!-- Reset All Button -->
+        <button
+          onclick="resetAllControls()"
+          class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700/80 text-slate-300 text-xs font-mono transition"
+          title="Reset all sliders, budget and feature filters"
+        >
+          <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+          </svg>
+          <span class="hidden sm:inline">Reset Sliders</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ==================== MAIN CONTENT CONTAINER ==================== -->
+  <main class="flex-1 max-w-[1600px] w-full mx-auto px-4 lg:px-8 py-6 space-y-6">
+
+    <!-- ==================== 1. BUYER PERSONA QUICK PRESETS BAR ==================== -->
+    <section class="bg-[#0e1424]/90 border border-slate-800/90 rounded-2xl p-4 sm:p-5 shadow-xl">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <div>
+          <span class="text-[11px] font-mono uppercase tracking-wider text-sky-400 font-semibold">Step 1 // One-Click Buyer Personas</span>
+          <h2 class="text-sm sm:text-base font-bold text-white">Who are you shopping for today?</h2>
+        </div>
+
+        <!-- 6 Persona Preset Pills -->
+        <div class="flex flex-wrap items-center gap-2" id="personaButtonsContainer">
+          <button onclick="applyPersona('balanced')" id="persona-balanced" class="persona-btn persona-active px-3.5 py-2 rounded-xl border border-slate-700/80 bg-slate-900/90 text-xs font-semibold text-slate-200 flex items-center gap-2 transition">
+            <span>⚖️</span>
+            <span>Balanced Daily Driver</span>
+          </button>
+          <button onclick="applyPersona('camera')" id="persona-camera" class="persona-btn px-3.5 py-2 rounded-xl border border-slate-700/80 bg-slate-900/90 hover:bg-slate-800 text-xs font-semibold text-slate-200 flex items-center gap-2 transition">
+            <span>📸</span>
+            <span>Pro Photographer</span>
+          </button>
+          <button onclick="applyPersona('gamer')" id="persona-gamer" class="persona-btn px-3.5 py-2 rounded-xl border border-slate-700/80 bg-slate-900/90 hover:bg-slate-800 text-xs font-semibold text-slate-200 flex items-center gap-2 transition">
+            <span>🎮</span>
+            <span>Hardcore Gamer</span>
+          </button>
+          <button onclick="applyPersona('battery')" id="persona-battery" class="persona-btn px-3.5 py-2 rounded-xl border border-slate-700/80 bg-slate-900/90 hover:bg-slate-800 text-xs font-semibold text-slate-200 flex items-center gap-2 transition">
+            <span>🔋</span>
+            <span>Battery Marathoner</span>
+          </button>
+          <button onclick="applyPersona('value')" id="persona-value" class="persona-btn px-3.5 py-2 rounded-xl border border-slate-700/80 bg-slate-900/90 hover:bg-slate-800 text-xs font-semibold text-slate-200 flex items-center gap-2 transition">
+            <span>🛠️</span>
+            <span>Value & Repair Hunter</span>
+          </button>
+          <button onclick="applyPersona('compact')" id="persona-compact" class="persona-btn px-3.5 py-2 rounded-xl border border-slate-700/80 bg-slate-900/90 hover:bg-slate-800 text-xs font-semibold text-slate-200 flex items-center gap-2 transition">
+            <span>👌</span>
+            <span>Compact One-Handed</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 2. CORE WORKSPACE GRID (LEFT: SLIDERS & FILTERS | RIGHT: LIVE RANKED PHONES) ==================== -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+      <!-- ==================== LEFT COLUMN (Cols 1-4): PRIORITY WEIGHT SLIDERS, BUDGET & MUST-HAVES ==================== -->
+      <aside class="lg:col-span-4 space-y-5 lg:sticky lg:top-20">
+
+        <!-- A. 5 Live Priority Weight Sliders Card -->
+        <div class="bg-[#0e1424]/95 border border-slate-800/90 rounded-2xl p-5 shadow-xl space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-800/80 pb-3">
+            <div>
+              <span class="text-[10px] font-mono uppercase tracking-widest text-indigo-400 font-bold">Step 2 // Priority Weights (0–10)</span>
+              <h3 class="text-base font-bold text-white">What Matters Most to You?</h3>
+            </div>
+            <span id="totalWeightBadge" class="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-700 font-mono text-[11px] text-slate-300">
+              35 pts total
+            </span>
+          </div>
+
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Drag any slider below to dynamically recalculate every phone's <strong class="text-slate-200">Personal Match %</strong> and re-rank the leaderboard in real time.
+          </p>
+
+          <!-- Slider 1: Camera Quality & Zoom -->
+          <div class="space-y-1.5 pt-1">
+            <div class="flex items-center justify-between text-xs">
+              <label for="sliderCamera" class="font-semibold text-slate-200 flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+                <span>📸 Camera Quality & Zoom</span>
+              </label>
+              <div class="flex items-center gap-1.5 font-mono">
+                <span id="shareCamera" class="text-[10px] text-slate-400">(20%)</span>
+                <span id="valCamera" class="px-2 py-0.5 rounded bg-rose-500/15 border border-rose-500/30 text-rose-300 font-bold">7 / 10</span>
+              </div>
+            </div>
+            <input id="sliderCamera" type="range" min="0" max="10" step="1" value="7" class="slider-camera" oninput="handleWeightChange()" />
+            <div class="flex justify-between text-[10px] font-mono text-slate-500">
+              <span>0 (Don't care)</span>
+              <span>5 (Important)</span>
+              <span>10 (Critical)</span>
+            </div>
+          </div>
+
+          <!-- Slider 2: Battery Life & Charging -->
+          <div class="space-y-1.5 pt-1">
+            <div class="flex items-center justify-between text-xs">
+              <label for="sliderBattery" class="font-semibold text-slate-200 flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                <span>🔋 Battery Life & Fast Charge</span>
+              </label>
+              <div class="flex items-center gap-1.5 font-mono">
+                <span id="shareBattery" class="text-[10px] text-slate-400">(23%)</span>
+                <span id="valBattery" class="px-2 py-0.5 rounded bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 font-bold">8 / 10</span>
+              </div>
+            </div>
+            <input id="sliderBattery" type="range" min="0" max="10" step="1" value="8" class="slider-battery" oninput="handleWeightChange()" />
+          </div>
+
+          <!-- Slider 3: Gaming & Sustained Thermals -->
+          <div class="space-y-1.5 pt-1">
+            <div class="flex items-center justify-between text-xs">
+              <label for="sliderGaming" class="font-semibold text-slate-200 flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span>
+                <span>🎮 Gaming & Sustained Speed</span>
+              </label>
+              <div class="flex items-center gap-1.5 font-mono">
+                <span id="shareGaming" class="text-[10px] text-slate-400">(17%)</span>
+                <span id="valGaming" class="px-2 py-0.5 rounded bg-purple-500/15 border border-purple-500/30 text-purple-300 font-bold">6 / 10</span>
+              </div>
+            </div>
+            <input id="sliderGaming" type="range" min="0" max="10" step="1" value="6" class="slider-gaming" oninput="handleWeightChange()" />
+          </div>
+
+          <!-- Slider 4: Display & Ergonomics -->
+          <div class="space-y-1.5 pt-1">
+            <div class="flex items-center justify-between text-xs">
+              <label for="sliderDisplay" class="font-semibold text-slate-200 flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-cyan-400"></span>
+                <span>✨ Display & Build Design</span>
+              </label>
+              <div class="flex items-center gap-1.5 font-mono">
+                <span id="shareDisplay" class="text-[10px] text-slate-400">(20%)</span>
+                <span id="valDisplay" class="px-2 py-0.5 rounded bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 font-bold">7 / 10</span>
+              </div>
+            </div>
+            <input id="sliderDisplay" type="range" min="0" max="10" step="1" value="7" class="slider-display" oninput="handleWeightChange()" />
+          </div>
+
+          <!-- Slider 5: Repairability & Value -->
+          <div class="space-y-1.5 pt-1">
+            <div class="flex items-center justify-between text-xs">
+              <label for="sliderValue" class="font-semibold text-slate-200 flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+                <span>🛠️ Repairability & Value</span>
+              </label>
+              <div class="flex items-center gap-1.5 font-mono">
+                <span id="shareValue" class="text-[10px] text-slate-400">(20%)</span>
+                <span id="valValue" class="px-2 py-0.5 rounded bg-amber-500/15 border border-amber-500/30 text-amber-300 font-bold">7 / 10</span>
+              </div>
+            </div>
+            <input id="sliderValue" type="range" min="0" max="10" step="1" value="7" class="slider-value" oninput="handleWeightChange()" />
+          </div>
+
+          <!-- Live Normalized Priority Distribution Bar -->
+          <div class="pt-3 border-t border-slate-800/80 space-y-1.5">
+            <div class="flex justify-between text-[11px] font-mono text-slate-400">
+              <span>Your Weight Distribution Mix</span>
+              <span class="text-slate-300">100% Normalized</span>
+            </div>
+            <div class="w-full h-2.5 rounded-full bg-slate-950 overflow-hidden flex p-0.5 border border-slate-800">
+              <div id="mixBarCamera" class="h-full bg-rose-500 transition-all duration-200" style="width:20%"></div>
+              <div id="mixBarBattery" class="h-full bg-emerald-500 transition-all duration-200" style="width:23%"></div>
+              <div id="mixBarGaming" class="h-full bg-purple-500 transition-all duration-200" style="width:17%"></div>
+              <div id="mixBarDisplay" class="h-full bg-cyan-400 transition-all duration-200" style="width:20%"></div>
+              <div id="mixBarValue" class="h-full bg-amber-400 transition-all duration-200" style="width:20%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- B. Max Budget Ceiling Slider & Over-Budget Mode -->
+        <div class="bg-[#0e1424]/95 border border-slate-800/90 rounded-2xl p-5 shadow-xl space-y-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <span class="text-[10px] font-mono uppercase tracking-widest text-sky-400 font-bold">Step 3 // Budget Ceiling</span>
+              <h3 class="text-base font-bold text-white">Maximum Spend</h3>
+            </div>
+            <span id="budgetReadoutBadge" class="px-3 py-1 rounded-xl bg-sky-500/15 border border-sky-400/40 font-mono text-sm font-extrabold text-sky-300">
+              $1,350
+            </span>
+          </div>
+
+          <div class="space-y-2">
+            <input
+              id="sliderBudget"
+              type="range"
+              min="550"
+              max="1350"
+              step="50"
+              value="1350"
+              class="slider-budget"
+              oninput="handleBudgetChange()"
+            />
+            <div class="flex justify-between text-[11px] font-mono text-slate-400">
+              <span id="budgetMinLabel">$550</span>
+              <span id="budgetMidLabel">$950</span>
+              <span id="budgetMaxLabel">$1,350</span>
+            </div>
+          </div>
+
+          <!-- Dim vs Hide Strict Toggle -->
+          <div class="flex items-center justify-between pt-2 border-t border-slate-800/80 text-xs">
+            <span class="text-slate-400">Phones above budget:</span>
+            <div class="flex items-center bg-slate-900 p-0.5 rounded-lg border border-slate-800 font-mono text-[11px]">
+              <button onclick="setBudgetFilterMode('dim')" id="budgetMode-dim" class="px-2.5 py-1 rounded-md bg-indigo-600 text-white font-semibold transition">Dim Card</button>
+              <button onclick="setBudgetFilterMode('hide')" id="budgetMode-hide" class="px-2.5 py-1 rounded-md text-slate-400 hover:text-white transition">Hide Strictly</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- C. Must-Have Hardware Feature Filter Pills -->
+        <div class="bg-[#0e1424]/95 border border-slate-800/90 rounded-2xl p-5 shadow-xl space-y-3.5">
+          <div class="flex items-center justify-between">
+            <div>
+              <span class="text-[10px] font-mono uppercase tracking-widest text-emerald-400 font-bold">Step 4 // Dealbreakers</span>
+              <h3 class="text-base font-bold text-white">Must-Have Features</h3>
+            </div>
+            <button onclick="clearMustHaveFilters()" class="text-[11px] font-mono text-slate-400 hover:text-emerald-300 transition">
+              Clear All
+            </button>
+          </div>
+
+          <div class="flex flex-wrap gap-2" id="mustHavePillsContainer">
+            <button onclick="toggleMustHave('periscope5x')" id="mh-periscope5x" class=" px-3 py-1.5 rounded-xl border border-slate-700/80 bg-slate-900/90 hover:border-slate-600 text-xs font-medium text-slate-300 flex items-center gap-1.5 transition">
+              <span>🔭 5x+ Periscope Zoom</span>
+            </button>
+            <button onclick="toggleMustHave('oled120')" id="mh-oled120" class="px-3 py-1.5 rounded-xl border border-slate-700/80 bg-slate-900/90 hover:border-slate-600 text-xs font-medium text-slate-300 flex items-center gap-1.5 transition">
+              <span>⚡ 120Hz+ OLED</span>
+            </button>
+            <button onclick="toggleMustHave('fastcharge65')" id="mh-fastcharge65" class="px-3 py-1.5 rounded-xl border border-slate-700/80 bg-slate-900/90 hover:border-slate-600 text-xs font-medium text-slate-300 flex items-center gap-1.5 transition">
+              <span>🔌 65W+ Fast Charge</span>
+            </button>
+            <button onclick="toggleMustHave('repairable')" id="mh-repairable" class="px-3 py-1.5 rounded-xl border border-slate-700/80 bg-slate-900/90 hover:border-slate-600 text-xs font-medium text-slate-300 flex items-center gap-1.5 transition">
+              <span>🪛 High Repairability (8+/10)</span>
+            </button>
+            <button onclick="toggleMustHave('compact')" id="mh-compact" class="px-3 py-1.5 rounded-xl border border-slate-700/80 bg-slate-900/90 hover:border-slate-600 text-xs font-medium text-slate-300 flex items-center gap-1.5 transition">
+              <span>🤏 Compact (&lt;6.2")</span>
+            </button>
+            <button onclick="toggleMustHave('bigbattery')" id="mh-bigbattery" class="px-3 py-1.5 rounded-xl border border-slate-700/80 bg-slate-900/90 hover:border-slate-600 text-xs font-medium text-slate-300 flex items-center gap-1.5 transition">
+              <span>🔋 5,200+ mAh Cell</span>
+            </button>
+          </div>
+        </div>
+
+      </aside>
+
+      <!-- ==================== RIGHT COLUMN (Cols 5-12): #1 WINNER BANNER + LIVE RANKED LEADERBOARD ==================== -->
+      <section class="lg:col-span-8 space-y-5">
+
+        <!-- Dynamic #1 Personal Best Match Spotlight Banner -->
+        <div id="topWinnerSpotlight" class="rounded-2xl bg-gradient-to-r from-indigo-950/90 via-slate-900/95 to-sky-950/90 border-2 border-indigo-500/60 p-5 shadow-2xl relative overflow-hidden">
+          <!-- Populated dynamically via JS -->
+        </div>
+
+        <!-- Toolbar above Leaderboard: Showing Count & Quick Sort Mode -->
+        <div class="flex flex-wrap items-center justify-between gap-2 px-1">
+          <div class="flex items-center gap-2">
+            <h2 class="text-sm sm:text-base font-bold text-white">Live Ranked Smartphone Leaderboard</h2>
+            <span id="qualifiedCountBadge" class="px-2.5 py-0.5 rounded-full text-xs font-mono bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+              5 of 5 Match Budget & Filters
+            </span>
+          </div>
+
+          <div class="flex items-center gap-2 text-xs font-mono text-slate-400">
+            <span>Click <strong class="text-sky-400">"+ Compare"</strong> on any 2 phones for Radar Arena</span>
+          </div>
+        </div>
+
+        <!-- Ranked Phone Cards Container -->
+        <div id="leaderboardContainer" class="space-y-4">
+          <!-- Populated dynamically via JS -->
+        </div>
+
+      </section>
+
+    </div>
+
+  </main>
+
+  <!-- ==================== HEAD-TO-HEAD COMPARE ARENA MODAL (WITH 5-AXIS RADAR CHART) ==================== -->
+  <div id="compareModal" class="hidden fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+    <div class="bg-[#0c1221] border border-slate-700/90 rounded-3xl max-w-5xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden my-auto">
+
+      <!-- Modal Header -->
+      <div class="px-5 py-4 bg-slate-900/90 border-b border-slate-800 flex flex-wrap items-center justify-between gap-3 shrink-0">
+        <div class="flex items-center gap-2.5">
+          <span class="w-2.5 h-2.5 rounded-full bg-sky-400 animate-ping"></span>
+          <div>
+            <span class="text-[10px] font-mono uppercase tracking-widest text-sky-400 font-bold">Head-to-Head Spec & Radar Arena</span>
+            <h3 class="text-base sm:text-lg font-extrabold text-white">Side-by-Side Smartphone Showdown</h3>
+          </div>
+        </div>
+
+        <!-- Phone A vs Phone B Dropdown Selectors -->
+        <div class="flex flex-wrap items-center gap-2">
+          <select id="selectPhoneA" onchange="handleCompareSelectChange()" class="bg-slate-950 border border-indigo-500/60 rounded-xl px-3 py-1.5 text-xs font-bold text-indigo-300 outline-none"></select>
+          <span class="font-mono text-xs font-extrabold text-slate-500">VS</span>
+          <select id="selectPhoneB" onchange="handleCompareSelectChange()" class="bg-slate-950 border border-emerald-500/60 rounded-xl px-3 py-1.5 text-xs font-bold text-emerald-300 outline-none"></select>
+
+          <button onclick="closeCompareModal()" class="ml-2 w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center font-bold transition" title="Close Compare Modal">
+            ✕
+          </button>
+        </div>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="p-5 sm:p-6 overflow-y-auto space-y-6">
+
+        <!-- Top Grid: Radar Chart (Left) + Personalized Winner Verdict & Score Bars (Right) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+
+          <!-- 5-Axis HTML5 Canvas Spider/Radar Chart -->
+          <div class="lg:col-span-5 bg-slate-950/80 border border-slate-800/90 rounded-2xl p-4 flex flex-col items-center">
+            <div class="text-xs font-mono text-slate-400 mb-2 flex items-center gap-4">
+              <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-indigo-500 inline-block"></span> <strong id="radarLegendA" class="text-indigo-300">Phone A</strong></span>
+              <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-emerald-400 inline-block"></span> <strong id="radarLegendB" class="text-emerald-300">Phone B</strong></span>
+            </div>
+            <canvas id="compareRadarCanvas" width="320" height="290" class="max-w-full"></canvas>
+            <p class="text-[11px] font-mono text-slate-500 mt-1 text-center">
+              Outer pentagon = 100 pts across all 5 test lab pillars
+            </p>
+          </div>
+
+          <!-- Side-by-Side Pillar Delta Bars & Dynamic Verdict -->
+          <div class="lg:col-span-7 space-y-4">
+            <div id="compareVerdictBox" class="p-4 rounded-2xl bg-gradient-to-r from-indigo-950/70 via-slate-900 to-emerald-950/70 border border-slate-700/80">
+              <!-- Populated via JS -->
+            </div>
+
+            <!-- 5 Pillar Comparison Bars -->
+            <div id="comparePillarBars" class="space-y-3 bg-slate-950/60 border border-slate-800/80 rounded-2xl p-4">
+              <!-- Populated via JS -->
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Detailed Hardware & 3-Year TCO Comparison Table -->
+        <div class="border border-slate-800 rounded-2xl overflow-hidden">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-slate-900/95 border-b border-slate-800 font-mono text-[11px] uppercase text-slate-400">
+                <th class="py-3 px-4 w-1/4">Hardware / TCO Metric</th>
+                <th id="tableHeaderPhoneA" class="py-3 px-4 w-3/8 text-indigo-300 font-bold">Phone A</th>
+                <th id="tableHeaderPhoneB" class="py-3 px-4 w-3/8 text-emerald-300 font-bold">Phone B</th>
+              </tr>
+            </thead>
+            <tbody id="compareSpecTableBody" class="divide-y divide-slate-800/70 bg-slate-950/50">
+              <!-- Populated via JS -->
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== FLOATING TOAST NOTIFICATION ==================== -->
+  <div id="toastBanner" class="fixed bottom-5 right-5 z-50 pointer-events-none opacity-0 translate-y-2 transition-all duration-300 px-4 py-2.5 rounded-xl bg-slate-900/95 border border-indigo-400/50 text-indigo-200 font-mono text-xs shadow-2xl flex items-center gap-2">
+    <span class="w-2 h-2 rounded-full bg-indigo-400 animate-ping"></span>
+    <span id="toastMessage">Leaderboard updated</span>
+  </div>
+
+  <!-- ==================== APPLICATION LOGIC & SMARTPHONE DATASET ==================== -->
+  <script>
+    /***************************************************************************
+     * 1. CURRENCY CONVERSION TABLE
+     ***************************************************************************/
+    const CURRENCIES = {
+      USD: { symbol: '$', rate: 1, locale: 'en-US', step: 50 },
+      INR: { symbol: '₹', rate: 86, locale: 'en-IN', step: 4000 },
+      EUR: { symbol: '€', rate: 0.92, locale: 'de-DE', step: 50 },
+      GBP: { symbol: '£', rate: 0.79, locale: 'en-GB', step: 40 }
+    };
+
+    /***************************************************************************
+     * 2. 5 ARCHETYPE 2026 SMARTPHONES DATASET
+     ***************************************************************************/
+    const PHONES_DATA = [
+      {
+        id: 'apex-ultra',
+        name: 'Apex S26 Ultra',
+        archetype: 'Ultra Flagship',
+        tagline: 'No-compromise titanium powerhouse with dual 5x & 10x periscopes and built-in low-latency stylus.',
+        priceUSD: 1299,
+        accentColor: '#38bdf8',
+        badgeBg: 'from-sky-500/20 to-indigo-500/20 border-sky-400/40 text-sky-300',
+        scores: {
+          camera: 96,
+          battery: 91,
+          gaming: 95,
+          display: 99,
+          value: 70
+        },
+        features: {
+          periscope5x: true,
+          oled120: true,
+          fastcharge65: true,
+          repairable: false,
+          compact: false,
+          bigbattery: true
+        },
+        specs: {
+          display: '6.9" QHD+ LTPO 3.0 AMOLED (1–120Hz, 2800 nits anti-reflective)',
+          soc: 'Snapdragon 8 Gen 5 Elite (3nm) + 16GB LPDDR5X',
+          cameras: '200MP 1-inch Wide + 50MP 5x & 10x Dual Periscope + 50MP Ultrawide',
+          battery: '5,400 mAh Silicon-Carbon • 65W Wired / 25W Qi2 MagSafe',
+          enduranceHrs: '15.2 hrs active screen-on time',
+          dimensions: '162.3 × 78.1 × 8.2 mm • 229g (Grade 5 Titanium + Stylus)',
+          repairability: '5.5 / 10 iFixit • Glued back glass & serialized screen ($279 screen repair)',
+          tco3YearUSD: 1419
+        },
+        pros: ['Best-in-class 2800-nit anti-reflective QHD+ panel', 'Unmatched 5x + 10x optical zoom versatility', 'Integrated Bluetooth stylus'],
+        cons: ['Expensive $1,299 price tag', 'Heavy 229g two-handed footprint'],
+        svgType: 'ultra'
+      },
+      {
+        id: 'pixellens-pro',
+        name: 'PixelLens 10 Pro',
+        archetype: 'Camera Flagship',
+        tagline: 'Computational photography king with 1-inch main sensor, 5x periscope, and 7 years of day-one OS updates.',
+        priceUSD: 999,
+        accentColor: '#f43f5e',
+        badgeBg: 'from-rose-500/20 to-amber-500/20 border-rose-400/40 text-rose-300',
+        scores: {
+          camera: 99,
+          battery: 85,
+          gaming: 82,
+          display: 93,
+          value: 84
+        },
+        features: {
+          periscope5x: true,
+          oled120: true,
+          fastcharge65: false,
+          repairable: false,
+          compact: false,
+          bigbattery: false
+        },
+        specs: {
+          display: '6.5" Super Actua LTPO OLED (1–120Hz, 2500 nits HDR)',
+          soc: 'Custom Tensor G5 AI ISP (3nm TSMC) + 16GB RAM',
+          cameras: '50MP 1-inch Type OIS + 48MP 5x Periscope + 48MP Macro-Ultrawide',
+          battery: '5,100 mAh Li-Ion • 45W USB-PD PPS / 23W Qi2',
+          enduranceHrs: '13.4 hrs active screen-on time',
+          dimensions: '158.0 × 74.8 × 8.5 mm • 204g (Iconic Aluminum Visor Bar)',
+          repairability: '7.0 / 10 iFixit • Genuine OEM parts on iFixit ($179 screen repair)',
+          tco3YearUSD: 1089
+        },
+        pros: ['Zero shutter lag & #1 skin-tone/night video grading', 'Cleanest OS with 7 years of guaranteed upgrades', 'Balanced $999 flagship pricing'],
+        cons: ['45W charging is slower than 65W–120W rivals', 'Peak 3D gaming frame rates trail ROG Nova 9'],
+        svgType: 'visor'
+      },
+      {
+        id: 'redcore-rog',
+        name: 'RedCore ROG Nova 9',
+        archetype: 'Gaming Beast',
+        tagline: 'Unthrottled 165Hz esports monster with 6,500 mAh dual-cell battery, 120W charge, and ultrasonic triggers.',
+        priceUSD: 1099,
+        accentColor: '#a855f7',
+        badgeBg: 'from-purple-500/20 to-fuchsia-500/20 border-purple-400/40 text-purple-300',
+        scores: {
+          camera: 76,
+          battery: 98,
+          gaming: 100,
+          display: 92,
+          value: 78
+        },
+        features: {
+          periscope5x: false,
+          oled120: true,
+          fastcharge65: true,
+          repairable: false,
+          compact: false,
+          bigbattery: true
+        },
+        specs: {
+          display: '6.8" 165Hz Notchless AMOLED (720Hz touch sampling, 2500Hz instant)',
+          soc: 'Overclocked 3.9GHz 3nm Extreme + Active Aero Vapor Chamber + 24GB RAM',
+          cameras: '50MP Sony IMX906 Gimbal OIS + 13MP Ultrawide + 32MP Under-Display Front',
+          battery: '6,500 mAh Dual-Cell Si-C • 120W HyperCharge (0–100% in 21m) + Bypass Power',
+          enduranceHrs: '18.1 hrs active screen-on time',
+          dimensions: '163.8 × 76.8 × 8.9 mm • 225g (AirTriggers + Dual USB-C + 3.5mm Hi-Fi DAC)',
+          repairability: '6.0 / 10 iFixit • Complex dual-battery vapor chamber stack',
+          tco3YearUSD: 1199
+        },
+        pros: ['99.4% sustained 3DMark wildlife stability without thermal throttling', 'Massive 6,500 mAh battery + 120W dual USB-C bypass charging', 'Ultrasonic shoulder triggers & 3.5mm audiophile jack'],
+        cons: ['Lacks a 5x periscope telephoto camera', 'Bulkier 8.9mm chassis'],
+        svgType: 'gaming'
+      },
+      {
+        id: 'zenform-mini',
+        name: 'ZenForm 16 Pro Mini',
+        archetype: 'Pro Compact',
+        tagline: 'Pocket-friendly 6.1" one-handed flagship packing a 4,900 mAh silicon-carbon cell and screw-in repairable internals.',
+        priceUSD: 849,
+        accentColor: '#06b6d4',
+        badgeBg: 'from-cyan-500/20 to-teal-500/20 border-cyan-400/40 text-cyan-300',
+        scores: {
+          camera: 88,
+          battery: 86,
+          gaming: 88,
+          display: 94,
+          value: 90
+        },
+        features: {
+          periscope5x: false,
+          oled120: true,
+          fastcharge65: true,
+          repairable: true,
+          compact: true,
+          bigbattery: false
+        },
+        specs: {
+          display: '6.1" 120Hz LTPO OLED (Ultra-slim 1.15mm symmetrical bezels, 2400 nits)',
+          soc: 'Flagship 3nm SoC + 12GB LPDDR5X + 512GB UFS 4.0 base storage',
+          cameras: '50MP 6-Axis Hybrid Gimbal OIS + 50MP 3x Optical Telephoto + 12MP Ultrawide',
+          battery: '4,900 mAh High-Density Silicon-Carbon • 65W Wired / 15W Wireless',
+          enduranceHrs: '13.8 hrs active screen-on time',
+          dimensions: '146.5 × 68.4 × 8.1 mm • 168g Featherweight Ceramic-Touch Frame',
+          repairability: '8.2 / 10 iFixit • Quick-release battery bracket & dual-entry chassis',
+          tco3YearUSD: 915
+        },
+        pros: ['Effortless one-handed 68.4mm width & 168g weight', '8.2/10 repairability with quick-release battery bracket', '65W fast charging & 512GB base storage at $849'],
+        cons: ['3x optical telephoto instead of a 5x periscope', 'Smaller screen for split-screen multitasking'],
+        svgType: 'compact'
+      },
+      {
+        id: 'fairpulse-v6',
+        name: 'FairPulse V6 Modular',
+        archetype: 'Value & Repair Champion',
+        tagline: 'Unbeatable $599 value with a 5-minute screwdriver-swappable 5,500 mAh battery, 80W charging, and 8-year warranty.',
+        priceUSD: 599,
+        accentColor: '#10b981',
+        badgeBg: 'from-emerald-500/20 to-lime-500/20 border-emerald-400/40 text-emerald-300',
+        scores: {
+          camera: 79,
+          battery: 94,
+          gaming: 80,
+          display: 85,
+          value: 99
+        },
+        features: {
+          periscope5x: false,
+          oled120: true,
+          fastcharge65: true,
+          repairable: true,
+          compact: false,
+          bigbattery: true
+        },
+        specs: {
+          display: '6.5" 120Hz Flat OLED (No glue clip-in frame, Gorilla Glass Victus, 1800 nits)',
+          soc: 'Efficient 4nm Flagship-Killer SoC + 12GB RAM + microSDXC expandable slot',
+          cameras: '50MP Sony LYT-808 OIS Main + 50MP 2x In-Sensor Zoom + 16MP Ultrawide',
+          battery: '5,500 mAh User-Swappable Li-Ion • 80W SuperVOOC / 15W Qi',
+          enduranceHrs: '16.4 hrs active screen-on time',
+          dimensions: '159.2 × 74.5 × 8.6 mm • 196g (100% Recycled Aluminum + Modular Back)',
+          repairability: '9.5 / 10 iFixit • Replace battery ($39) or USB-C port ($19) in 3 minutes',
+          tco3YearUSD: 638
+        },
+        pros: ['9.5/10 iFixit score: swap battery ($39) or screen ($89) with a Phillips #00 screwdriver', 'Lowest 3-year Total Cost of Ownership ($638) & 5,500 mAh endurance', 'Includes microSD slot & 80W fast charger in box'],
+        cons: ['No 5x periscope zoom lens', '4nm chip is 15% slower than 3nm Ultra flagships in heavy ray-tracing'],
+        svgType: 'modular'
+      }
+    ];
+
+    /***************************************************************************
+     * 3. BUYER PERSONA PRESETS CONFIGURATION
+     ***************************************************************************/
+    const PERSONA_PRESETS = {
+      balanced: {
+        label: 'Balanced Daily Driver',
+        weights: { camera: 7, battery: 8, gaming: 6, display: 7, value: 7 },
+        budgetUSD: 1350,
+        mustHaves: []
+      },
+      camera: {
+        label: 'Pro Photographer',
+        weights: { camera: 10, battery: 6, gaming: 4, display: 9, value: 4 },
+        budgetUSD: 1350,
+        mustHaves: ['periscope5x', 'oled120']
+      },
+      gamer: {
+        label: 'Hardcore Gamer',
+        weights: { camera: 3, battery: 9, gaming: 10, display: 8, value: 5 },
+        budgetUSD: 1350,
+        mustHaves: ['oled120', 'fastcharge65', 'bigbattery']
+      },
+      battery: {
+        label: 'Battery Marathoner',
+        weights: { camera: 5, battery: 10, gaming: 5, display: 6, value: 8 },
+        budgetUSD: 1350,
+        mustHaves: ['bigbattery', 'fastcharge65']
+      },
+      value: {
+        label: 'Value & Repair Hunter',
+        weights: { camera: 5, battery: 8, gaming: 5, display: 6, value: 10 },
+        budgetUSD: 900,
+        mustHaves: ['repairable']
+      },
+      compact: {
+        label: 'Compact One-Handed',
+        weights: { camera: 8, battery: 7, gaming: 7, display: 9, value: 8 },
+        budgetUSD: 1000,
+        mustHaves: ['compact', 'oled120']
+      }
+    };
+
+    /***************************************************************************
+     * 4. APPLICATION STATE
+     ***************************************************************************/
+    let state = {
+      currency: 'USD',
+      activePersona: 'balanced',
+      weights: { camera: 7, battery: 8, gaming: 6, display: 7, value: 7 },
+      maxBudgetUSD: 1350,
+      budgetFilterMode: 'dim', // 'dim' | 'hide'
+      mustHaves: [],           // array of feature keys
+      expandedCardIds: [],     // phone IDs showing full specs & TCO
+      comparePair: ['apex-ultra', 'pixellens-pro']
+    };
+
+    /***************************************************************************
+     * 5. HELPER FUNCTIONS: CURRENCY, SVG SILHOUETTES & WEIGHTED MATCH ENGINE
+     ***************************************************************************/
+    function formatPrice(usdAmount) {
+      const cfg = CURRENCIES[state.currency];
+      const converted = Math.round(usdAmount * cfg.rate);
+      return `${cfg.symbol}${converted.toLocaleString(cfg.locale)}`;
+    }
+
+    function getPhoneIllustrationSVG(svgType, accent) {
+      if (svgType === 'ultra') {
+        // Boxy Titanium Ultra with S-Pen & Quad Camera Rings
+        return `
+          <svg viewBox="0 0 110 140" class="w-20 h-24 sm:w-24 sm:h-28 shrink-0 drop-shadow-lg">
+            <rect x="14" y="6" width="66" height="128" rx="4" fill="#0f172a" stroke="${accent}" stroke-width="2.2"/>
+            <rect x="18" y="10" width="58" height="120" rx="2" fill="#1e293b"/>
+            <!-- Quad camera rings -->
+            <circle cx="28" cy="24" r="6" fill="#090d16" stroke="${accent}" stroke-width="1.5"/>
+            <circle cx="28" cy="40" r="6" fill="#090d16" stroke="${accent}" stroke-width="1.5"/>
+            <circle cx="28" cy="56" r="6" fill="#090d16" stroke="${accent}" stroke-width="1.5"/>
+            <circle cx="42" cy="32" r="4.5" fill="#090d16" stroke="#94a3b8" stroke-width="1.2"/>
+            <circle cx="42" cy="48" r="4.5" fill="#090d16" stroke="#94a3b8" stroke-width="1.2"/>
+            <!-- Stylus Pen -->
+            <rect x="88" y="18" width="6" height="112" rx="3" fill="${accent}" />
+            <rect x="87" y="14" width="8" height="6" rx="1.5" fill="#e2e8f0" />
+          </svg>
+        `;
+      }
+      if (svgType === 'visor') {
+        // Rounded Flagship with Horizontal Camera Visor Bar
+        return `
+          <svg viewBox="0 0 110 140" class="w-20 h-24 sm:w-24 sm:h-28 shrink-0 drop-shadow-lg">
+            <rect x="20" y="6" width="70" height="128" rx="14" fill="#0f172a" stroke="${accent}" stroke-width="2.2"/>
+            <rect x="24" y="10" width="62" height="120" rx="11" fill="#1e293b"/>
+            <!-- Camera Visor Bar -->
+            <rect x="21" y="22" width="68" height="22" rx="6" fill="#090d16" stroke="${accent}" stroke-width="1.6"/>
+            <circle cx="36" cy="33" r="6" fill="#1e293b" stroke="${accent}" stroke-width="1.5"/>
+            <circle cx="54" cy="33" r="6" fill="#1e293b" stroke="#94a3b8" stroke-width="1.5"/>
+            <rect x="66" y="27" width="12" height="12" rx="3" fill="#1e293b" stroke="${accent}" stroke-width="1.5"/>
+          </svg>
+        `;
+      }
+      if (svgType === 'gaming') {
+        // RGB Cyber Gaming Phone with Aero Vent & Triggers
+        return `
+          <svg viewBox="0 0 110 140" class="w-20 h-24 sm:w-24 sm:h-28 shrink-0 drop-shadow-lg">
+            <rect x="18" y="6" width="74" height="128" rx="8" fill="#090d16" stroke="${accent}" stroke-width="2.2"/>
+            <!-- Diagonal Cyber Lines -->
+            <path d="M24 18 L86 55 L86 95 L24 122 Z" fill="#1e1b4b" opacity="0.6"/>
+            <line x1="25" y1="75" x2="85" y2="45" stroke="${accent}" stroke-width="2"/>
+            <polygon points="45,65 65,55 60,82" fill="none" stroke="#e879f9" stroke-width="1.8"/>
+            <!-- Camera Pentagon -->
+            <polygon points="26,18 62,18 68,36 26,36" fill="#0f172a" stroke="${accent}" stroke-width="1.5"/>
+            <circle cx="38" cy="27" r="5" fill="#1e293b" stroke="#e879f9" stroke-width="1.4"/>
+            <circle cx="52" cy="27" r="4" fill="#1e293b" stroke="#94a3b8" stroke-width="1.2"/>
+            <!-- Shoulder Triggers -->
+            <rect x="93" y="22" width="4" height="18" rx="2" fill="#e879f9"/>
+            <rect x="93" y="100" width="4" height="18" rx="2" fill="#e879f9"/>
+          </svg>
+        `;
+      }
+      if (svgType === 'compact') {
+        // Sleek Compact One-Handed 6.1" Silhouette
+        return `
+          <svg viewBox="0 0 110 140" class="w-20 h-24 sm:w-24 sm:h-28 shrink-0 drop-shadow-lg">
+            <rect x="26" y="14" width="58" height="112" rx="14" fill="#0f172a" stroke="${accent}" stroke-width="2.2"/>
+            <rect x="30" y="18" width="50" height="104" rx="11" fill="#1e293b"/>
+            <!-- Dual Gimbal Rings -->
+            <rect x="34" y="23" width="26" height="40" rx="8" fill="#090d16" stroke="${accent}" stroke-width="1.5"/>
+            <circle cx="47" cy="34" r="7" fill="#1e293b" stroke="${accent}" stroke-width="1.6"/>
+            <circle cx="47" cy="51" r="6" fill="#1e293b" stroke="#94a3b8" stroke-width="1.4"/>
+            <text x="55" y="108" text-anchor="middle" fill="${accent}" font-size="8" font-family="monospace" font-weight="bold">6.1" MINI</text>
+          </svg>
+        `;
+      }
+      // Modular Repairable Phone with Visible Screws & Swappable Battery Outline
+      return `
+        <svg viewBox="0 0 110 140" class="w-20 h-24 sm:w-24 sm:h-28 shrink-0 drop-shadow-lg">
+          <rect x="20" y="6" width="70" height="128" rx="12" fill="#0f172a" stroke="${accent}" stroke-width="2.2"/>
+          <rect x="25" y="11" width="60" height="118" rx="9" fill="#1e293b" stroke="#334155" stroke-dasharray="3 2"/>
+          <!-- Modular Swappable Battery Bay -->
+          <rect x="32" y="54" width="46" height="62" rx="5" fill="#064e3b" stroke="${accent}" stroke-width="1.6"/>
+          <text x="55" y="88" text-anchor="middle" fill="#a7f3d0" font-size="8" font-family="monospace" font-weight="bold">5500mAh</text>
+          <text x="55" y="99" text-anchor="middle" fill="#34d399" font-size="6.5" font-family="monospace">SWAPPABLE</text>
+          <!-- Camera Module -->
+          <rect x="32" y="18" width="24" height="28" rx="6" fill="#090d16" stroke="${accent}" stroke-width="1.5"/>
+          <circle cx="44" cy="28" r="5" fill="#1e293b" stroke="${accent}" stroke-width="1.4"/>
+          <circle cx="44" cy="39" r="4" fill="#1e293b" stroke="#94a3b8" stroke-width="1.2"/>
+          <!-- Corner Torx/Phillips Screw Heads -->
+          <circle cx="30" cy="16" r="2" fill="${accent}"/>
+          <circle cx="80" cy="16" r="2" fill="${accent}"/>
+          <circle cx="30" cy="124" r="2" fill="${accent}"/>
+          <circle cx="80" cy="124" r="2" fill="${accent}"/>
+        </svg>
+      `;
+    }
+
+    function calculatePhoneEvaluation(phone) {
+      const w = state.weights;
+      const totalW = w.camera + w.battery + w.gaming + w.display + w.value;
+
+      // Avoid division by zero if user sets all sliders to 0
+      const safeTotal = totalW === 0 ? 1 : totalW;
+      const effW = totalW === 0
+        ? { camera: 0.2, battery: 0.2, gaming: 0.2, display: 0.2, value: 0.2 }
+        : {
+            camera: w.camera / safeTotal,
+            battery: w.battery / safeTotal,
+            gaming: w.gaming / safeTotal,
+            display: w.display / safeTotal,
+            value: w.value / safeTotal
+          };
+
+      // Weighted score out of 100
+      const weightedScore =
+        phone.scores.camera * effW.camera +
+        phone.scores.battery * effW.battery +
+        phone.scores.gaming * effW.gaming +
+        phone.scores.display * effW.display +
+        phone.scores.value * effW.value;
+
+      const matchPct = Math.round(weightedScore);
+
+      // Contribution breakdown (out of 100) for segmented progress bar
+      const contributions = {
+        camera: +(phone.scores.camera * effW.camera).toFixed(1),
+        battery: +(phone.scores.battery * effW.battery).toFixed(1),
+        gaming: +(phone.scores.gaming * effW.gaming).toFixed(1),
+        display: +(phone.scores.display * effW.display).toFixed(1),
+        value: +(phone.scores.value * effW.value).toFixed(1)
+      };
+
+      // Budget check
+      const withinBudget = phone.priceUSD <= state.maxBudgetUSD;
+
+      // Must-have feature checks
+      const missingFeatures = state.mustHaves.filter((featKey) => !phone.features[featKey]);
+      const passesMustHaves = missingFeatures.length === 0;
+
+      return {
+        ...phone,
+        matchPct,
+        rawScore: weightedScore,
+        contributions,
+        withinBudget,
+        passesMustHaves,
+        missingFeatures,
+        isFullyQualified: withinBudget && passesMustHaves
+      };
+    }
+
+    const FEATURE_LABELS = {
+      periscope5x: '5x+ Periscope Zoom',
+      oled120: '120Hz+ OLED',
+      fastcharge65: '65W+ Fast Charge',
+      repairable: '8+/10 Repairability',
+      compact: 'Compact (<6.2")',
+      bigbattery: '5,200+ mAh Battery'
+    };
+
+    /***************************************************************************
+     * 6. UI EVENT HANDLERS (SLIDERS, PRESETS, CURRENCY, MUST-HAVES)
+     ***************************************************************************/
+    function handleWeightChange(fromPersona = false) {
+      state.weights.camera = parseInt(document.getElementById('sliderCamera').value, 10);
+      state.weights.battery = parseInt(document.getElementById('sliderBattery').value, 10);
+      state.weights.gaming = parseInt(document.getElementById('sliderGaming').value, 10);
+      state.weights.display = parseInt(document.getElementById('sliderDisplay').value, 10);
+      state.weights.value = parseInt(document.getElementById('sliderValue').value, 10);
+
+      if (!fromPersona) {
+        state.activePersona = null;
+        document.querySelectorAll('.persona-btn').forEach((btn) => btn.classList.remove('persona-active'));
+      }
+
+      updateWeightReadouts();
+      renderAll();
+    }
+
+    function updateWeightReadouts() {
+      const w = state.weights;
+      const sum = w.camera + w.battery + w.gaming + w.display + w.value;
+      const safeSum = sum === 0 ? 1 : sum;
+
+      document.getElementById('totalWeightBadge').textContent = `${sum} pts total`;
+
+      const pillars = [
+        { key: 'camera', cap: 'Camera' },
+        { key: 'battery', cap: 'Battery' },
+        { key: 'gaming', cap: 'Gaming' },
+        { key: 'display', cap: 'Display' },
+        { key: 'value', cap: 'Value' }
+      ];
+
+      pillars.forEach(({ key, cap }) => {
+        const val = w[key];
+        const sharePct = sum === 0 ? 20 : Math.round((val / safeSum) * 100);
+        document.getElementById(`val${cap}`).textContent = `${val} / 10`;
+        document.getElementById(`share${cap}`).textContent = `(${sharePct}%)`;
+        document.getElementById(`mixBar${cap}`).style.width = `${sharePct}%`;
+      });
+    }
+
+    function applyPersona(personaKey) {
+      const preset = PERSONA_PRESETS[personaKey];
+      if (!preset) return;
+
+      state.activePersona = personaKey;
+      state.weights = { ...preset.weights };
+      state.maxBudgetUSD = preset.budgetUSD;
+      state.mustHaves = [...preset.mustHaves];
+
+      // Sync sliders
+      document.getElementById('sliderCamera').value = state.weights.camera;
+      document.getElementById('sliderBattery').value = state.weights.battery;
+      document.getElementById('sliderGaming').value = state.weights.gaming;
+      document.getElementById('sliderDisplay').value = state.weights.display;
+      document.getElementById('sliderValue').value = state.weights.value;
+      document.getElementById('sliderBudget').value = state.maxBudgetUSD;
+
+      // Sync persona buttons
+      document.querySelectorAll('.persona-btn').forEach((btn) => {
+        btn.classList.toggle('persona-active', btn.id === `persona-${personaKey}`);
+      });
+
+      // Sync must-have pills
+      syncMustHavePillStyles();
+      updateWeightReadouts();
+      updateBudgetLabels();
+      renderAll();
+      showToast(`Applied "${preset.label}" Profile & Re-Ranked`);
+    }
+
+    function handleBudgetChange() {
+      state.maxBudgetUSD = parseInt(document.getElementById('sliderBudget').value, 10);
+      updateBudgetLabels();
+      renderAll();
+    }
+
+    function updateBudgetLabels() {
+      document.getElementById('budgetReadoutBadge').textContent = formatPrice(state.maxBudgetUSD);
+      document.getElementById('budgetMinLabel').textContent = formatPrice(550);
+      document.getElementById('budgetMidLabel').textContent = formatPrice(950);
+      document.getElementById('budgetMaxLabel').textContent = formatPrice(1350);
+    }
+
+    function setBudgetFilterMode(mode) {
+      state.budgetFilterMode = mode;
+      document.getElementById('budgetMode-dim').className =
+        mode === 'dim'
+          ? 'px-2.5 py-1 rounded-md bg-indigo-600 text-white font-semibold transition'
+          : 'px-2.5 py-1 rounded-md text-slate-400 hover:text-white transition';
+      document.getElementById('budgetMode-hide').className =
+        mode === 'hide'
+          ? 'px-2.5 py-1 rounded-md bg-indigo-600 text-white font-semibold transition'
+          : 'px-2.5 py-1 rounded-md text-slate-400 hover:text-white transition';
+      renderAll();
+    }
+
+    function setCurrency(currKey) {
+      state.currency = currKey;
+      ['USD', 'INR', 'EUR', 'GBP'].forEach((k) => {
+        const btn = document.getElementById(`currBtn-${k}`);
+        btn.className =
+          k === currKey
+            ? 'px-2.5 py-1 rounded-lg font-bold transition bg-indigo-600 text-white'
+            : 'px-2.5 py-1 rounded-lg font-bold text-slate-400 hover:text-white transition';
+      });
+      updateBudgetLabels();
+      renderAll();
+      if (!document.getElementById('compareModal').classList.contains('hidden')) {
+        renderCompareArena();
+      }
+      showToast(`Switched Pricing Display to ${currKey}`);
+    }
+
+    function toggleMustHave(featKey) {
+      const idx = state.mustHaves.indexOf(featKey);
+      if (idx === -1) {
+        state.mustHaves.push(featKey);
+      } else {
+        state.mustHaves.splice(idx, 1);
+      }
+      syncMustHavePillStyles();
+      renderAll();
+    }
+
+    function clearMustHaveFilters() {
+      state.mustHaves = [];
+      syncMustHavePillStyles();
+      renderAll();
+      showToast('Cleared Must-Have Feature Filters');
+    }
+
+    function syncMustHavePillStyles() {
+      Object.keys(FEATURE_LABELS).forEach((k) => {
+        const btn = document.getElementById(`mh-${k}`);
+        if (btn) {
+          btn.classList.toggle('musthave-active', state.mustHaves.includes(k));
+        }
+      });
+    }
+
+    function resetAllControls() {
+      state.budgetFilterMode = 'dim';
+      setBudgetFilterMode('dim');
+      applyPersona('balanced');
+      showToast('All Priority Sliders, Budget & Filters Reset');
+    }
+
+    function toggleExpandSpecs(phoneId) {
+      const idx = state.expandedCardIds.indexOf(phoneId);
+      if (idx === -1) {
+        state.expandedCardIds.push(phoneId);
+      } else {
+        state.expandedCardIds.splice(idx, 1);
+      }
+      renderAll();
+    }
+
+    /***************************************************************************
+     * 7. RENDER TOP WINNER SPOTLIGHT & RANKED LEADERBOARD
+     ***************************************************************************/
+    function renderAll() {
+      const evaluated = PHONES_DATA.map(calculatePhoneEvaluation);
+
+      // Sort priority:
+      // 1. Fully qualified phones (within budget AND passes must-have filters) come first, ordered by matchPct DESC
+      // 2. Non-qualified phones follow, ordered by matchPct DESC
+      evaluated.sort((a, b) => {
+        if (a.isFullyQualified !== b.isFullyQualified) {
+          return a.isFullyQualified ? -1 : 1;
+        }
+        return b.rawScore - a.rawScore;
+      });
+
+      const qualifiedList = evaluated.filter((p) => p.isFullyQualified);
+      document.getElementById('qualifiedCountBadge').textContent =
+        `${qualifiedList.length} of ${evaluated.length} Match Budget & Filters`;
+
+      renderTopWinnerSpotlight(evaluated[0], qualifiedList.length > 0);
+      renderLeaderboardCards(evaluated);
+    }
+
+    function renderTopWinnerSpotlight(winner, hasQualifiedWinner) {
+      const container = document.getElementById('topWinnerSpotlight');
+      if (!winner) return;
+
+      // Find top 2 highest weighted pillars for this winner
+      const pillarNames = {
+        camera: 'Camera & Zoom',
+        battery: 'Battery Endurance',
+        gaming: 'Gaming & Thermals',
+        display: 'Display Quality',
+        value: 'Value & Repairability'
+      };
+      const sortedPillars = Object.entries(winner.contributions)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 2)
+        .map(([k]) => pillarNames[k]);
+
+      container.innerHTML = `
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
+          <div class="flex items-center gap-4">
+            ${getPhoneIllustrationSVG(winner.svgType, winner.accentColor)}
+            <div class="space-y-1.5">
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-mono font-extrabold uppercase bg-amber-400 text-slate-950 shadow">
+                  🏆 #1 Best Match For You
+                </span>
+                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-mono font-semibold bg-gradient-to-r ${winner.badgeBg} border">
+                  ${winner.archetype}
+                </span>
+                ${
+                  !hasQualifiedWinner
+                    ? `<span class="px-2 py-0.5 rounded text-[10px] font-mono bg-rose-500/20 text-rose-300 border border-rose-500/40">
+                        Closest Match (Adjust Budget/Filters)
+                      </span>`
+                    : ''
+                }
+              </div>
+
+              <div class="flex flex-wrap items-baseline gap-3">
+                <h2 class="text-xl sm:text-2xl font-extrabold text-white">${winner.name}</h2>
+                <span class="font-mono text-lg font-bold text-sky-400">${formatPrice(winner.priceUSD)}</span>
+              </div>
+
+              <p class="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
+                ${winner.tagline} Driven by your priority on <strong class="text-white">${sortedPillars.join(' & ')}</strong>.
+              </p>
+            </div>
+          </div>
+
+          <!-- Right: Giant Match Score & Quick Compare Action -->
+          <div class="flex sm:flex-col items-center sm:items-end justify-between w-full md:w-auto gap-3 border-t md:border-t-0 pt-3 md:pt-0 border-slate-800">
+            <div class="text-left sm:text-right">
+              <div class="text-[10px] font-mono uppercase tracking-widest text-indigo-300">Personal Match Score</div>
+              <div class="font-mono text-3xl sm:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 via-sky-300 to-emerald-300">
+                ${winner.matchPct}%
+              </div>
+            </div>
+            <button
+              onclick="openCompareWithPhone('${winner.id}')"
+              class="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-xs font-mono font-bold text-white transition"
+            >
+              Compare #1 vs #2 →
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderLeaderboardCards(evaluatedPhones) {
+      const container = document.getElementById('leaderboardContainer');
+
+      const visiblePhones = evaluatedPhones.filter((p) => {
+        if (state.budgetFilterMode === 'hide' && !p.withinBudget) return false;
+        return true;
+      });
+
+      if (visiblePhones.length === 0) {
+        container.innerHTML = `
+          <div class="p-10 rounded-2xl bg-[#0e1424] border border-dashed border-slate-700 text-center space-y-3">
+            <div class="text-base font-bold text-white">No smartphones under ${formatPrice(state.maxBudgetUSD)}</div>
+            <p class="text-xs text-slate-400">Raise your Max Budget ceiling slider or switch from "Hide Strictly" to "Dim Card".</p>
+            <button onclick="resetAllControls()" class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-mono font-bold">
+              Reset Budget & Filters
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = visiblePhones.map((phone, index) => {
+        const rank = index + 1;
+        const isExpanded = state.expandedCardIds.includes(phone.id);
+        const isSelectedForCompare = state.comparePair.includes(phone.id);
+        const dimmedClass = !phone.isFullyQualified ? 'opacity-60 hover:opacity-95 border-slate-800/70' : 'border-slate-800 hover:border-slate-700';
+
+        return `
+          <article class="phone-card-transition rounded-2xl bg-[#0e1424]/95 border ${
+            rank === 1 && phone.isFullyQualified ? 'border-indigo-500/70 shadow-lg shadow-indigo-500/10' : dimmedClass
+          } p-4 sm:p-5">
+
+            <!-- Main Card Row -->
+            <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+
+              <!-- Left: Rank Badge + SVG Phone Vector + Core Specs -->
+              <div class="flex items-start sm:items-center gap-3.5 sm:gap-4 flex-1 min-w-0">
+                <!-- Rank Number Column -->
+                <div class="flex flex-col items-center justify-center shrink-0">
+                  <div class="w-9 h-9 rounded-xl font-mono text-sm font-extrabold flex items-center justify-center ${
+                    rank === 1 && phone.isFullyQualified
+                      ? 'bg-gradient-to-br from-amber-400 to-orange-500 text-slate-950 shadow'
+                      : rank === 2
+                      ? 'bg-slate-800 text-sky-300 border border-sky-500/40'
+                      : 'bg-slate-900 text-slate-400 border border-slate-800'
+                  }">
+                    #${rank}
+                  </div>
+                </div>
+
+                <!-- Custom SVG Silhouette -->
+                ${getPhoneIllustrationSVG(phone.svgType, phone.accentColor)}
+
+                <!-- Title, Price, Archetype & Filter Status -->
+                <div class="space-y-1.5 min-w-0 flex-1">
+                  <div class="flex flex-wrap items-center gap-1.5">
+                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-gradient-to-r ${phone.badgeBg} border">
+                      ${phone.archetype}
+                    </span>
+
+                    ${
+                      !phone.withinBudget
+                        ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-rose-500/20 text-rose-300 border border-rose-500/40">
+                            Over Budget (+${formatPrice(phone.priceUSD - state.maxBudgetUSD)})
+                          </span>`
+                        : `<span class="px-2 py-0.5 rounded-full text-[10px] font-mono bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                            ✓ In Budget
+                          </span>`
+                    }
+
+                    ${
+                      phone.missingFeatures.map((mf) => `
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-mono bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                          Missing: ${FEATURE_LABELS[mf]}
+                        </span>
+                      `).join('')
+                    }
+                  </div>
+
+                  <div class="flex flex-wrap items-baseline gap-2.5">
+                    <h3 class="text-base sm:text-lg font-extrabold text-white truncate">${phone.name}</h3>
+                    <span class="font-mono text-sm sm:text-base font-bold text-sky-400">${formatPrice(phone.priceUSD)}</span>
+                    <span class="text-[11px] font-mono text-slate-400">• 3-Yr TCO: ${formatPrice(phone.specs.tco3YearUSD)}</span>
+                  </div>
+
+                  <p class="text-xs text-slate-300 line-clamp-2">${phone.tagline}</p>
+
+                  <!-- 5 Sub-Score Mini Pills -->
+                  <div class="flex flex-wrap items-center gap-1.5 pt-1 font-mono text-[11px]">
+                    <span class="px-2 py-0.5 rounded-md bg-rose-500/10 border border-rose-500/30 text-rose-300">📸 Cam ${phone.scores.camera}</span>
+                    <span class="px-2 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-emerald-300">🔋 Bat ${phone.scores.battery}</span>
+                    <span class="px-2 py-0.5 rounded-md bg-purple-500/10 border border-purple-500/30 text-purple-300">🎮 Game ${phone.scores.gaming}</span>
+                    <span class="px-2 py-0.5 rounded-md bg-cyan-500/10 border border-cyan-500/30 text-cyan-300">✨ Disp ${phone.scores.display}</span>
+                    <span class="px-2 py-0.5 rounded-md bg-amber-500/10 border border-amber-500/30 text-amber-300">🛠️ Val/Rep ${phone.scores.value}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right: Weighted Match Gauge + Segmented Contribution Bar + Compare/Details Buttons -->
+              <div class="w-full md:w-56 shrink-0 flex flex-col justify-between gap-2.5 pt-3 md:pt-0 border-t md:border-t-0 border-slate-800/80">
+                <div class="flex items-baseline justify-between">
+                  <span class="text-[11px] font-mono uppercase text-slate-400">Weighted Match</span>
+                  <span class="font-mono text-2xl font-extrabold text-white">${phone.matchPct}%</span>
+                </div>
+
+                <!-- Multi-Colored Weighted Contribution Bar -->
+                <div class="w-full h-2.5 rounded-full bg-slate-950 overflow-hidden flex border border-slate-800 p-0.5" title="Weighted pillar contribution to your match score">
+                  <div class="h-full bg-rose-500" style="width:${phone.contributions.camera}%"></div>
+                  <div class="h-full bg-emerald-500" style="width:${phone.contributions.battery}%"></div>
+                  <div class="h-full bg-purple-500" style="width:${phone.contributions.gaming}%"></div>
+                  <div class="h-full bg-cyan-400" style="width:${phone.contributions.display}%"></div>
+                  <div class="h-full bg-amber-400" style="width:${phone.contributions.value}%"></div>
+                </div>
+
+                <!-- Action Buttons: + Compare & Full Specs Accordion -->
+                <div class="flex items-center gap-2 pt-1">
+                  <button
+                    onclick="togglePhoneInCompare('${phone.id}')"
+                    class="flex-1 py-1.5 px-2.5 rounded-xl font-mono text-xs font-semibold border transition flex items-center justify-center gap-1 ${
+                      isSelectedForCompare
+                        ? 'bg-indigo-600/30 border-indigo-400 text-indigo-200'
+                        : 'bg-slate-900 hover:bg-slate-800 border-slate-700 text-slate-300'
+                    }"
+                  >
+                    <span>${isSelectedForCompare ? '✓ In Arena' : '+ Compare'}</span>
+                  </button>
+
+                  <button
+                    onclick="toggleExpandSpecs('${phone.id}')"
+                    class="py-1.5 px-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 font-mono text-xs text-slate-300 transition"
+                  >
+                    ${isExpanded ? 'Hide Specs ▲' : 'Specs & TCO ▼'}
+                  </button>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Expandable Full Hardware Specs, Pros/Cons & 3-Year TCO Drawer -->
+            ${
+              isExpanded
+                ? `<div class="mt-4 pt-4 border-t border-slate-800/90 grid grid-cols-1 md:grid-cols-12 gap-4 text-xs">
+                    <!-- Hardware Spec Sheet -->
+                    <div class="md:col-span-7 bg-slate-950/70 border border-slate-800/80 rounded-xl p-3.5 space-y-2">
+                      <div class="text-[10px] font-mono uppercase tracking-wider text-sky-400 font-bold">Lab Hardware Specifications & Repair Index</div>
+                      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-slate-300">
+                        <div><span class="text-slate-500 block font-mono text-[10px]">DISPLAY</span>${phone.specs.display}</div>
+                        <div><span class="text-slate-500 block font-mono text-[10px]">SILICON & RAM</span>${phone.specs.soc}</div>
+                        <div><span class="text-slate-500 block font-mono text-[10px]">CAMERA SYSTEM</span>${phone.specs.cameras}</div>
+                        <div><span class="text-slate-500 block font-mono text-[10px]">BATTERY & CHARGING</span>${phone.specs.battery}</div>
+                        <div><span class="text-slate-500 block font-mono text-[10px]">LAB BATTERY ENDURANCE</span><strong class="text-emerald-400">${phone.specs.enduranceHrs}</strong></div>
+                        <div><span class="text-slate-500 block font-mono text-[10px]">REPAIRABILITY & TCO</span>${phone.specs.repairability}</div>
+                      </div>
+                    </div>
+
+                    <!-- Pros & Cons Verdict -->
+                    <div class="md:col-span-5 bg-slate-950/70 border border-slate-800/80 rounded-xl p-3.5 flex flex-col justify-between space-y-3">
+                      <div>
+                        <div class="text-[10px] font-mono uppercase tracking-wider text-emerald-400 font-bold mb-1">Why Buy This Phone</div>
+                        <ul class="space-y-1 text-slate-300">
+                          ${phone.pros.map((pr) => `<li class="flex items-start gap-1.5"><span class="text-emerald-400 font-bold">✓</span><span>${pr}</span></li>`).join('')}
+                        </ul>
+                      </div>
+                      <div>
+                        <div class="text-[10px] font-mono uppercase tracking-wider text-rose-400 font-bold mb-1">Trade-offs to Consider</div>
+                        <ul class="space-y-1 text-slate-400">
+                          ${phone.cons.map((cn) => `<li class="flex items-start gap-1.5"><span class="text-rose-400 font-bold">✕</span><span>${cn}</span></li>`).join('')}
+                        </ul>
+                      </div>
+                    </div>
+                  </div>`
+                : ''
+            }
+
+          </article>
+        `;
+      }).join('');
+    }
+
+    /***************************************************************************
+     * 8. HEAD-TO-HEAD COMPARE ARENA & 5-AXIS HTML5 CANVAS RADAR CHART
+     ***************************************************************************/
+    function togglePhoneInCompare(phoneId) {
+      if (state.comparePair[0] === phoneId || state.comparePair[1] === phoneId) {
+        openCompareModal();
+        return;
+      }
+      // Shift queue so newest clicked phone compares with previous primary
+      state.comparePair = [state.comparePair[1], phoneId];
+      document.getElementById('compareTrayBadge').textContent = '2 Selected';
+      renderAll();
+      openCompareModal();
+    }
+
+    function openCompareWithPhone(winnerId) {
+      const evaluated = PHONES_DATA.map(calculatePhoneEvaluation).sort((a, b) => b.rawScore - a.rawScore);
+      const runnerUp = evaluated.find((p) => p.id !== winnerId) || evaluated[1];
+      state.comparePair = [winnerId, runnerUp.id];
+      openCompareModal();
+    }
+
+    function openCompareModal() {
+      const modal = document.getElementById('compareModal');
+      modal.classList.remove('hidden');
+
+      const selA = document.getElementById('selectPhoneA');
+      const selB = document.getElementById('selectPhoneB');
+
+      selA.innerHTML = PHONES_DATA.map((p) => `<option value="${p.id}">${p.name} (${formatPrice(p.priceUSD)})</option>`).join('');
+      selB.innerHTML = PHONES_DATA.map((p) => `<option value="${p.id}">${p.name} (${formatPrice(p.priceUSD)})</option>`).join('');
+
+      selA.value = state.comparePair[0];
+      selB.value = state.comparePair[1];
+
+      renderCompareArena();
+    }
+
+    function closeCompareModal() {
+      document.getElementById('compareModal').classList.add('hidden');
+    }
+
+    function handleCompareSelectChange() {
+      const idA = document.getElementById('selectPhoneA').value;
+      const idB = document.getElementById('selectPhoneB').value;
+      state.comparePair = [idA, idB];
+      renderAll();
+      renderCompareArena();
+    }
+
+    function renderCompareArena() {
+      const phoneA = calculatePhoneEvaluation(PHONES_DATA.find((p) => p.id === state.comparePair[0]) || PHONES_DATA[0]);
+      const phoneB = calculatePhoneEvaluation(PHONES_DATA.find((p) => p.id === state.comparePair[1]) || PHONES_DATA[1]);
+
+      document.getElementById('radarLegendA').textContent = phoneA.name;
+      document.getElementById('radarLegendB').textContent = phoneB.name;
+      document.getElementById('tableHeaderPhoneA').textContent = `${phoneA.name} (${formatPrice(phoneA.priceUSD)})`;
+      document.getElementById('tableHeaderPhoneB').textContent = `${phoneB.name} (${formatPrice(phoneB.priceUSD)})`;
+
+      // 1. Dynamic "Why This Wins For You" Verdict
+      const winner = phoneA.rawScore >= phoneB.rawScore ? phoneA : phoneB;
+      const loser = phoneA.rawScore >= phoneB.rawScore ? phoneB : phoneA;
+      const diffPts = Math.abs(phoneA.matchPct - phoneB.matchPct);
+      const priceDiff = Math.abs(phoneA.priceUSD - phoneB.priceUSD);
+
+      document.getElementById('compareVerdictBox').innerHTML = `
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-1.5">
+          <span class="text-[11px] font-mono uppercase tracking-wider text-sky-400 font-bold">Personalized Head-to-Head Verdict</span>
+          <span class="px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-indigo-500/20 text-indigo-200 border border-indigo-400/40">
+            +${diffPts}% Higher Match For Your Sliders
+          </span>
+        </div>
+        <h4 class="text-sm sm:text-base font-extrabold text-white">
+          🏆 <span class="text-sky-300">${winner.name}</span> (${winner.matchPct}% match) beats <span class="text-slate-300">${loser.name}</span> (${loser.matchPct}% match) for your current priorities.
+        </h4>
+        <p class="text-xs text-slate-300 mt-1 leading-relaxed">
+          ${
+            winner.priceUSD < loser.priceUSD
+              ? `Not only does ${winner.name} score higher on your weighted sliders, it also saves you <strong class="text-emerald-300">${formatPrice(priceDiff)}</strong> upfront.`
+              : `${winner.name} costs <strong class="text-amber-300">${formatPrice(priceDiff)}</strong> more than ${loser.name}, but delivers stronger performance in your highest-weighted categories.`
+          }
+        </p>
+      `;
+
+      // 2. Side-by-Side Pillar Progress Bars with Delta Badges
+      const pillars = [
+        { key: 'camera', label: '📸 Camera & Zoom', weight: state.weights.camera },
+        { key: 'battery', label: '🔋 Battery & Charging', weight: state.weights.battery },
+        { key: 'gaming', label: '🎮 Gaming & Thermals', weight: state.weights.gaming },
+        { key: 'display', label: '✨ Display & Design', weight: state.weights.display },
+        { key: 'value', label: '🛠️ Repairability & Value', weight: state.weights.value }
+      ];
+
+      document.getElementById('comparePillarBars').innerHTML = pillars.map((pil) => {
+        const sA = phoneA.scores[pil.key];
+        const sB = phoneB.scores[pil.key];
+        const delta = sA - sB;
+
+        return `
+          <div class="space-y-1">
+            <div class="flex items-center justify-between text-xs font-mono">
+              <span class="text-indigo-300 font-bold">${sA} pts ${delta > 0 ? `<span class="text-[10px] text-emerald-400">(+${delta})</span>` : ''}</span>
+              <span class="text-slate-300 font-sans font-semibold">${pil.label} <span class="text-[10px] font-mono text-slate-500">(Weight ${pil.weight}/10)</span></span>
+              <span class="text-emerald-300 font-bold">${delta < 0 ? `<span class="text-[10px] text-emerald-400">(+${Math.abs(delta)})</span> ` : ''}${sB} pts</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2 items-center">
+              <div class="w-full h-2 rounded-full bg-slate-900 overflow-hidden flex justify-end">
+                <div class="h-full bg-indigo-500 rounded-full" style="width:${sA}%"></div>
+              </div>
+              <div class="w-full h-2 rounded-full bg-slate-900 overflow-hidden">
+                <div class="h-full bg-emerald-400 rounded-full" style="width:${sB}%"></div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // 3. Detailed Spec & TCO Table
+      const rows = [
+        ['Personal Match %', `<strong class="text-indigo-300 font-mono text-sm">${phoneA.matchPct}%</strong>`, `<strong class="text-emerald-300 font-mono text-sm">${phoneB.matchPct}%</strong>`],
+        ['Retail Price', `<span class="font-mono font-bold">${formatPrice(phoneA.priceUSD)}</span>`, `<span class="font-mono font-bold">${formatPrice(phoneB.priceUSD)}</span>`],
+        ['3-Year Total Cost (TCO)', `<span class="font-mono text-slate-300">${formatPrice(phoneA.specs.tco3YearUSD)}</span>`, `<span class="font-mono text-slate-300">${formatPrice(phoneB.specs.tco3YearUSD)}</span>`],
+        ['Display Panel', phoneA.specs.display, phoneB.specs.display],
+        ['Processor & RAM', phoneA.specs.soc, phoneB.specs.soc],
+        ['Camera Hardware', phoneA.specs.cameras, phoneB.specs.cameras],
+        ['Battery & Charging', phoneA.specs.battery, phoneB.specs.battery],
+        ['Lab Screen-On Time', `<strong class="text-emerald-300">${phoneA.specs.enduranceHrs}</strong>`, `<strong class="text-emerald-300">${phoneB.specs.enduranceHrs}</strong>`],
+        ['Dimensions & Weight', phoneA.specs.dimensions, phoneB.specs.dimensions],
+        ['iFixit Repairability', phoneA.specs.repairability, phoneB.specs.repairability]
+      ];
+
+      document.getElementById('compareSpecTableBody').innerHTML = rows.map(([label, valA, valB]) => `
+        <tr class="hover:bg-slate-900/40">
+          <td class="py-2.5 px-4 font-mono text-[11px] text-slate-400 font-semibold">${label}</td>
+          <td class="py-2.5 px-4 text-slate-200">${valA}</td>
+          <td class="py-2.5 px-4 text-slate-200">${valB}</td>
+        </tr>
+      `).join('');
+
+      // 4. Draw 5-Axis Radar Chart on Canvas
+      drawRadarChart(phoneA, phoneB);
+    }
+
+    function drawRadarChart(phoneA, phoneB) {
+      const canvas = document.getElementById('compareRadarCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width;
+      const h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+
+      const cx = w / 2;
+      const cy = h / 2 + 6;
+      const radius = 96;
+      const axes = [
+        { key: 'camera', label: 'Camera' },
+        { key: 'battery', label: 'Battery' },
+        { key: 'gaming', label: 'Gaming' },
+        { key: 'display', label: 'Display' },
+        { key: 'value', label: 'Value/Repair' }
+      ];
+
+      // Draw concentric pentagon grid rings (25%, 50%, 75%, 100%)
+      [0.25, 0.5, 0.75, 1.0].forEach((lvl) => {
+        ctx.beginPath();
+        axes.forEach((_, i) => {
+          const angle = (Math.PI * 2 * i) / axes.length - Math.PI / 2;
+          const x = cx + Math.cos(angle) * radius * lvl;
+          const y = cy + Math.sin(angle) * radius * lvl;
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        });
+        ctx.closePath();
+        ctx.strokeStyle = lvl === 1 ? '#334155' : '#1e293b';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      });
+
+      // Draw axis spokes & labels
+      axes.forEach((ax, i) => {
+        const angle = (Math.PI * 2 * i) / axes.length - Math.PI / 2;
+        const x = cx + Math.cos(angle) * radius;
+        const y = cy + Math.sin(angle) * radius;
+
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(x, y);
+        ctx.strokeStyle = '#1e293b';
+        ctx.stroke();
+
+        const lx = cx + Math.cos(angle) * (radius + 24);
+        const ly = cy + Math.sin(angle) * (radius + 18);
+        ctx.fillStyle = '#cbd5e1';
+        ctx.font = '600 11px "JetBrains Mono", monospace';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(ax.label, lx, ly);
+      });
+
+      // Helper to plot polygon for a phone
+      function plotPolygon(scoresObj, strokeColor, fillColor) {
+        ctx.beginPath();
+        axes.forEach((ax, i) => {
+          const val = (scoresObj[ax.key] || 0) / 100;
+          const angle = (Math.PI * 2 * i) / axes.length - Math.PI / 2;
+          const x = cx + Math.cos(angle) * radius * val;
+          const y = cy + Math.sin(angle) * radius * val;
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        });
+        ctx.closePath();
+        ctx.fillStyle = fillColor;
+        ctx.fill();
+        ctx.strokeStyle = strokeColor;
+        ctx.lineWidth = 2.4;
+        ctx.stroke();
+
+        // Vertex dots
+        axes.forEach((ax, i) => {
+          const val = (scoresObj[ax.key] || 0) / 100;
+          const angle = (Math.PI * 2 * i) / axes.length - Math.PI / 2;
+          const x = cx + Math.cos(angle) * radius * val;
+          const y = cy + Math.sin(angle) * radius * val;
+          ctx.beginPath();
+          ctx.arc(x, y, 3.5, 0, Math.PI * 2);
+          ctx.fillStyle = strokeColor;
+          ctx.fill();
+        });
+      }
+
+      plotPolygon(phoneA.scores, '#6366f1', 'rgba(99, 102, 241, 0.25)');
+      plotPolygon(phoneB.scores, '#10b981', 'rgba(16, 185, 129, 0.22)');
+    }
+
+    /***************************************************************************
+     * 9. TOAST NOTIFICATION & INITIALIZATION
+     ***************************************************************************/
+    let toastTimeout = null;
+    function showToast(msg) {
+      const banner = document.getElementById('toastBanner');
+      document.getElementById('toastMessage').textContent = msg;
+      banner.classList.remove('opacity-0', 'translate-y-2');
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        banner.classList.add('opacity-0', 'translate-y-2');
+      }, 2400);
+    }
+
+    // Close modal on Escape key
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeCompareModal();
+    });
+
+    window.onload = function () {
+      updateWeightReadouts();
+      updateBudgetLabels();
+      renderAll();
+    };
+  </script>
+</body>
+</html>
